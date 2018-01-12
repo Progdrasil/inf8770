@@ -33,3 +33,9 @@ CODE ALL THE THINGS!!!
 
 # Question 04
 ANALYSE ALL THE THINGS!!!
+
+
+pour git clone fait cette commande:
+``` bash
+git submodule init --quiet
+```

@@ -50,7 +50,7 @@ void text(string path) {
 	}
 
 	// TODO: Compress file here
-
+	// check test.cpp in compression
 	uint8_t ** cBuffer;
 	int *compressedSizeBytes;
 	int *compressedSizeBits;
