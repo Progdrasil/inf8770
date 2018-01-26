@@ -5,25 +5,44 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <boost/program_options.hpp>
+// #include <boost/filesystem.hpp>
 
 using namespace std;
+namespace po = boost::program_options;
+// namespace fs = boost::filesystem;
 
 void text(string path);
 
 int main(int argc, char *argv[]) {
-	if (argc != 3) {
-		cout << "Il faut inclure le path comme premier argument et le type comme deuxieme" << endl;
+	string path, type;
+
+	// Declare the supported options
+	po::options_description desc("Allowed Options");
+	desc.add_options()
+		("help,h", "produce help message")
+		("path,p", po::value<string>(&path), "Path to the file to compress")
+		("type,t", po::value<string>(&type), "The type of file to compress")
+	;
+	po::variables_map vm;
+	try {
+		po::store(po::parse_command_line(argc, argv, desc), vm);
+	}
+	catch (boost::exception &) {
+		cout << "Invalid Option!!" << endl;
+		cout << desc << endl;
+		return -1;
+	}
+	po::notify(vm);
+
+	if (vm.count("help")) {
+		cout << desc << endl;
 		return 1;
 	}
 
-	string type = argv[2];
-	string path = argv[1];
-
-	if (type == "text") {
+	if (type.compare("text")) {
 		text(path);
 	}
-
-	cout << argv[0] << endl;
 	return 0;
 }
 
