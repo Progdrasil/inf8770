@@ -1,3 +1,14 @@
+/*******************************************************************************
+	TP01: comparaison codage Huffman et LZW
+
+	Autheurs:
+		- Rene Leveille
+		- Thibault Noilly
+
+	Cree le: 12/01/2018
+	Modifier le: 26/01/2018
+*******************************************************************************/
+
 #define HUFFMAN_IMPLEMENTATION
 #define LZW_IMPLEMENTATION
 #include "huffman.hpp"
@@ -10,6 +21,8 @@
 
 using namespace std;
 namespace po = boost::program_options;
+
+// Advance initializations
 struct results {
 	double compress_time;
 	double decompress_time;
@@ -64,6 +77,7 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 
+// Finds inital file size
 int filesize(const string path) {
 	ifstream in(path, ifstream::ate | ifstream::binary);
 
@@ -74,9 +88,13 @@ int filesize(const string path) {
 double calcTime(clock_t start, clock_t end) {
 	return double(end - start) * 1000.0 / CLOCKS_PER_SEC;
 }
+
+// Returns the compression rate
 double calcTaux(int compressedSize, int size) {
 	return 1.0 - double(compressedSize)/double(size);
 }
+
+// Processes the text file before runing benchmark
 void text(string path) {
 	cout << "Following output for " << path << endl;
 	cout << "---------------------" << endl << endl;
@@ -131,7 +149,7 @@ void text(string path) {
 	inFile.close();
 }
 
-// Returns compressed size in bytes
+// Runs huffman benchmark and returns compressed size in bytes
 int compute_huffman(uint8_t * data, int length, double * compress_time, double * decompress_time) {
 	int compressedSizeBytes = 0;
     int compressedSizeBits  = 0;
@@ -164,7 +182,7 @@ int compute_huffman(uint8_t * data, int length, double * compress_time, double *
 	return compressedSizeBytes;
 }
 
-// Returns compressed size in bytes
+// Runs LZW benchmark and returns compressed size in bytes
 int compute_lzw(uint8_t * data, int length, double * compress_time, double * decompress_time) {
 	int compressedSizeBytes = 0;
     int compressedSizeBits  = 0;
@@ -197,6 +215,7 @@ int compute_lzw(uint8_t * data, int length, double * compress_time, double * dec
 	return compressedSizeBytes;
 }
 
+// Prints out benchmark results
 void output_res(const int * length, const results * huff_res, const results * lzw_res){
 	cout << "Taille du fichier sans compression = " << *length                   << endl;
 	cout << "Taille compresser Huffman          = " << huff_res->compressed_size << endl;
