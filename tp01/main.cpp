@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 	string path, type;
 
 	// Declare the supported options
-	po::options_description desc("Allowed Options");
+	po::options_description desc{"Allowed Options"};
 	desc.add_options()
 		("help,h", "produce help message")
 		("path,p", po::value<string>(&path), "Path to the file to compress")
@@ -40,8 +40,16 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	if (type.compare("text")) {
-		text(path);
+	if (vm.count("type") && vm.count("path")) {
+		if (type == "text") {
+			cout << "hello" << endl;
+			text(path);
+		}
+	}
+	else {
+		cout << "You must specify type and path" << endl;
+		cout << desc << endl;
+		return -2;
 	}
 	return 0;
 }
@@ -70,12 +78,22 @@ void text(string path) {
 
 	// TODO: Compress file here
 	// check test.cpp in compression
-	uint8_t ** cBuffer;
-	int *compressedSizeBytes;
-	int *compressedSizeBits;
-	huffman::easyEncode((uint8_t*) buffer, length, cBuffer, compressedSizeBytes, compressedSizeBits);
+	// uint8_t * cBuffer = nullptr;
+	// int compressedSizeBytes{0};
+	// int compressedSizeBits{0};
+	// vector<uint8_t> uncompressedBuffer(sizeof(inFile), 0);
+	// huffman::easyEncode((uint8_t*) buffer, length, &cBuffer, &compressedSizeBytes, &compressedSizeBits);
 
-	if (cBuffer) {
+	int compressedSizeBytes = 0;
+    int compressedSizeBits  = 0;
+    std::uint8_t * compressedData = nullptr;
+    std::vector<std::uint8_t> uncompressedBuffer(length, 0);
+
+    // Compress:
+    huffman::easyEncode((uint8_t*)buffer, length, &compressedData,
+                        &compressedSizeBytes, &compressedSizeBits);
+
+	if (compressedData) {
 		cout << "compressed successfully" << endl;
 	} else {
 		cout << "ERROR: not compressed successfully" << endl;
