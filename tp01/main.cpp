@@ -2,10 +2,11 @@
 #define LZW_IMPLEMENTATION
 #include "huffman.hpp"
 #include "lzw.hpp"
+#include <boost/program_options.hpp>
+#include <ctime>
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <boost/program_options.hpp>
 // #include <boost/filesystem.hpp>
 
 using namespace std;
@@ -13,6 +14,9 @@ namespace po = boost::program_options;
 // namespace fs = boost::filesystem;
 
 void text(string path);
+int filesize(const string path);
+double huffmanCompress(uint8_t * buffer, int length);
+double lzwCompress(uint8_t * data, int length);
 
 int main(int argc, char *argv[]) {
 	string path, type;
@@ -54,17 +58,21 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 
+int filesize(const string path) {
+	ifstream in(path, ifstream::ate | ifstream::binary);
+
+	return in.tellg();
+}
+
 void text(string path) {
 	ifstream inFile;
 
-	inFile.open(path);
+	inFile.open(path, ifstream::binary);
 	if (!inFile) {
 		cout << "unable to open" << path << endl;
 		exit(1);
 	}
-	inFile.seekg (0, inFile.end);
-    int length = inFile.tellg();
-    inFile.seekg (0, inFile.beg);
+	int length = filesize(path);
 
 	char *buffer = new char [length];
 
@@ -76,33 +84,67 @@ void text(string path) {
 		cout << "error: only " << inFile.gcount() << " could be read" << endl;
 	}
 
-	// TODO: Compress file here
-	// check test.cpp in compression
-	// uint8_t * cBuffer = nullptr;
-	// int compressedSizeBytes{0};
-	// int compressedSizeBits{0};
-	// vector<uint8_t> uncompressedBuffer(sizeof(inFile), 0);
-	// huffman::easyEncode((uint8_t*) buffer, length, &cBuffer, &compressedSizeBytes, &compressedSizeBits);
+	// Huffman Compression
+	clock_t start_huff = clock();
+	double taux_huff = huffmanCompress((uint8_t*) buffer, length);
+	clock_t end_huff = clock();
+	double time_huff = double(end_huff - start_huff) / CLOCKS_PER_SEC;
 
+	// LZW compression
+	clock_t start_lzw = clock();
+	double taux_lzw = lzwCompress((uint8_t*) buffer, length);
+	clock_t end_lzw = clock();
+	double time_lzw = double(end_lzw - start_lzw) / CLOCKS_PER_SEC;
+
+	cout << "Temps de compression Huffman " << time_huff << endl;
+	cout << "Taux de compression Huffman " << taux_huff << endl;
+
+	cout << "Temps de compression Huffman " << time_lzw << endl;
+	cout << "Taux de compression Huffman " << taux_lzw << endl;
+
+	delete[] buffer;
+	inFile.close();
+	cout << path << endl;
+}
+
+double huffmanCompress(uint8_t * data, int length) {
 	int compressedSizeBytes = 0;
     int compressedSizeBits  = 0;
     std::uint8_t * compressedData = nullptr;
     std::vector<std::uint8_t> uncompressedBuffer(length, 0);
 
     // Compress:
-    huffman::easyEncode((uint8_t*)buffer, length, &compressedData,
+    huffman::easyEncode(data, length, &compressedData,
                         &compressedSizeBytes, &compressedSizeBits);
 
+	// Check if there were any errors
 	if (compressedData) {
-		cout << "compressed successfully" << endl;
+		cout << "Huffman compressed successfully" << endl;
 	} else {
 		cout << "ERROR: not compressed successfully" << endl;
 	}
-	// TODO: calculate time of compression
-	// TODO: calculate compression ratio
 
+	// Return compression ratio
+	return 1 - compressedSizeBytes/length;
+}
 
-	delete[] buffer;
-	inFile.close();
-	cout << path << endl;
+double lzwCompress(uint8_t * data, int length) {
+	int compressedSizeBytes = 0;
+    int compressedSizeBits  = 0;
+    std::uint8_t * compressedData = nullptr;
+    std::vector<std::uint8_t> uncompressedBuffer(length, 0);
+
+    // Compress:
+    lzw::easyEncode(data, length, &compressedData,
+                        &compressedSizeBytes, &compressedSizeBits);
+
+	// Check if there were any errors
+	if (compressedData) {
+		cout << "Huffman compressed successfully" << endl;
+	} else {
+		cout << "ERROR: not compressed successfully" << endl;
+	}
+
+	// Return compression ratio
+	return 1 - compressedSizeBytes/length;
 }
