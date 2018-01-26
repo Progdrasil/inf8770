@@ -1,10 +1,14 @@
-CC 		 = g++
+CC = g++
 CPPFLAGS = -Wall -g -std=c++11 -Iinclude -Iinclude/compression
+EDLFLAGS = -lopencv_core -lopencv_imgcodecs
 
-all: clean tp01.o 
+all: clean tp01 
 
 clean:
-	rm *.o
+	rm -f *.o ./compression_results/*
 
 tp01.o: main.cpp
-	$(CC) $(CPPFLAGS) $(INCLUDES) $< -o $@
+	$(CC) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
+
+tp01: tp01.o
+	$(CC) $(EDLFLAGS) -o tp01 tp01.o
