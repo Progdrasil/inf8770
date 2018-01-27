@@ -1,6 +1,6 @@
 CC = g++
-CPPFLAGS = -Wall -g -std=c++11 -Iinclude -Iinclude/compression
-EDLFLAGS = -lopencv_core -lopencv_imgcodecs
+CPPFLAGS = -Wall -g -std=c++11 -Iinclude -Iinclude/compression 
+EDLFLAGS = -lopencv_core -lopencv_imgcodecs -lboost_program_options
 
 all: clean tp01 
 
