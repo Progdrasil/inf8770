@@ -398,6 +398,5 @@ void image(string path) {
 	// =================== Post Processing =========================
 	output_res(&sampleSize, &huff_res, &lzw_res);
 
-	delete[] sampleData;
 	// LZW_MFREE(compressedData);
 }
