@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 	desc.add_options()
 		("help,h", "produce help message")
 		("path,p", po::value<string>(&path), "Path to the file to compress")
-		("type,t", po::value<string>(&type), "The type of file to compress")
+		("type,t", po::value<string>(&type), "The type of file to compress, either 'text' or 'img'")
 	;
 	po::variables_map vm;
 	try {
@@ -299,7 +299,7 @@ void image(string path, bool color) {
 		taux_lzw
 	};
 
-	
+
 	// string compPathLZW = "compression_results/compressedLZW";
 	// cout << "Check " << compPathLZW << " to see the LZW compression result." << endl;
 	//
