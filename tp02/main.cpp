@@ -9,10 +9,11 @@
 	Modifie le: 26/01/2018
 *******************************************************************************/
 
+#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <string>
 #include <iostream>
-#include <boost/filesystem.hpp>
+#include "conversion.hpp"
 
 using namespace std;
 namespace po = boost::program_options;

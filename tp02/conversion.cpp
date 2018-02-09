@@ -1,9 +1,4 @@
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
-void bgr2ycbcr(cv::Mat &bgrIn, cv::Mat &yOut, cv::Mat &cbOut, cv::Mat &crOut);
-void ycbcr2bgr(cv::Mat& yIn, cv::Mat& cbIn, cv::Mat& crIn, cv::Mat& bgrOut);
+#include "conversion.hpp"
 
 // OpenCV reads images as BGR, not RGB
 void bgr2ycbcr(cv::Mat &bgrIn, cv::Mat &yOut, cv::Mat &cbOut, cv::Mat &crOut)
@@ -51,7 +46,7 @@ void ycbcr2bgr(cv::Mat& yIn, cv::Mat& cbIn, cv::Mat& crIn, cv::Mat& bgrOut)
 		for (int j = 0; j < colsIn; j++)
 		{
 			ycrcbOut.at<cv::Vec3b>(i, j)[0] = yOut.at<uint8_t>(i, j);
-			
+
 			int x, y;
 			if (i % 2 != 0)
 				x = (i - 1) / 2;
