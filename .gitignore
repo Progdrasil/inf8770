@@ -1,9 +1,3 @@
-*
-!/**/
-!*.*
-!Makefile
-
-*.DS_Store
 # Prerequisites
 *.d
 
@@ -39,6 +33,9 @@
 
 # Mac
 *.dSYM
+*.DS_Store
 
 *.pdf
 *.zip
+
+tp
