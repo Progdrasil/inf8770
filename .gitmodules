@@ -1,3 +1,6 @@
 [submodule "tp01/include/compression"]
 	path = tp01/include/compression
 	url = https://github.com/glampert/compression-algorithms.git
+[submodule "compression"]
+	path = tp02/include/compression
+	url = https://github.com/glampert/compression-algorithms.git
