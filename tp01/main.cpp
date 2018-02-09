@@ -33,7 +33,7 @@ struct results {
 };
 
 void text(string path);
-void image(string path);
+void image(string path, bool color);
 int filesize(const string path);
 int compute_huffman(uint8_t * data, int length, double * compress_time, double * decompress_time);
 int compute_lzw(uint8_t * data, int length, double * compress_time, double * decompress_time);
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 	desc.add_options()
 		("help,h", "produce help message")
 		("path,p", po::value<string>(&path), "Path to the file to compress")
-		("type,t", po::value<string>(&type), "The type of file to compress")
+		("type,t", po::value<string>(&type), "The type of file to compress, either 'text' or 'img'")
 	;
 	po::variables_map vm;
 	try {
@@ -73,8 +73,10 @@ int main(int argc, char *argv[]) {
 		}
 		else if (type == "img")
 		{
-			image(path);
+			image(path, true);
 		}
+		else if (type == "imgnb")
+			image(path, false);
 	}
 	else {
 		cout << "You must specify type and path" << endl;
@@ -246,129 +248,82 @@ void output_res(const int * length, const results * huff_res, const results * lz
 	cout << "Taux de compression LZW            = " << lzw_res->compression_rate << endl;
 }
 
-void image(string path) {
+void image(string path, bool color) {
 	cout << "Reading image" << endl;
 
-	cv::Mat inImage = cv::imread(path, cv::IMREAD_COLOR);
-
-	uint8_t *sampleData = (uint8_t *)inImage.data;
-
-	int sampleSize = inImage.rows * inImage.cols * 3; // 3 CHANNELS (RGB)
-	uint8_t *compressedData = nullptr;
-	int compressedSizeBytes = 0;
-	int compressedSizeBits = 0;
-
-	uint8_t *uncompressedData = new uint8_t[sampleSize];
-	int uncompressedSize = 0;
-
-	// =================== Compression Huffman =========================
-	huffman::easyEncode((uint8_t *)sampleData, sampleSize, &compressedData,
-						&compressedSizeBytes, &compressedSizeBits);
-	uncompressedSize = huffman::easyDecode(compressedData, compressedSizeBytes, compressedSizeBits,
-										uncompressedData, sampleSize);
-
-	cout << "Huffman compression results ========" << endl;
-	if (compressedData)
+	cv::Mat inImage;
+	uint8_t *sampleData;
+	int sampleSize;
+	if (color)
 	{
-		cout << "Compression successful" << endl;
-		cout << "Bytes size compressed : " << compressedSizeBytes << endl;
-		cout << "Bits size compressed : " << compressedSizeBits << endl;
+		inImage = cv::imread(path, cv::IMREAD_COLOR);
 
-		// Compression validation
-		bool successful = true;
-		if (uncompressedSize != sampleSize)
-		{
-			cerr << "HUFFMAN COMPRESSION ERROR! Size mismatch" << endl;
-			;
-			successful = false;
-		}
-		if (memcmp(uncompressedData, sampleData, sampleSize) != 0)
-		{
-			cerr << "HUFFMAN COMPRESSION ERROR! Data corrupted" << endl;
-			successful = false;
-		}
+		sampleData = (uint8_t *)inImage.data;
 
-		if (successful)
-		{
-			cout << "Huffman compression/decompression lossless" << endl;
-
-			string compPathHuffman = "compression_results/compressedHuffman";
-			cout << "Check " << compPathHuffman << " to see the Huffman compression result." << endl;
-
-			ofstream compHuffmanFile;
-			compHuffmanFile.open(compPathHuffman);
-			compHuffmanFile << compressedData << endl;
-			compHuffmanFile.close();
-		}
-	} else {
-		cout << "Error while compressing" << endl;
-	}
-
-	string uncompPathHuffman = "compression_results/uncompressedHuffman.png";
-	cout << "Check " << uncompPathHuffman << " to see the decompression result." << endl;
-
-	cv::Mat outImageHuffman = cv::Mat(inImage.rows, inImage.cols, CV_8UC3, (uchar *)uncompressedData);
-	imwrite(uncompPathHuffman, outImageHuffman);
-
-	HUFFMAN_MFREE(compressedData);
-
-	// =================== Compression LZW =============================
-	lzw::easyEncode((uint8_t *)sampleData, sampleSize, &compressedData,
-						&compressedSizeBytes, &compressedSizeBits);
-	uncompressedSize = lzw::easyDecode(compressedData, compressedSizeBytes, compressedSizeBits,
-										   uncompressedData, sampleSize);
-
-	cout << "LZW compression results ========" << endl;
-	if (compressedData)
-	{
-		cout << "Compression successful" << endl;
-		cout << "Bytes size compressed : " << compressedSizeBytes << endl;
-		cout << "Bits size compressed : " << compressedSizeBits << endl;
-
-		// Compression validation
-		bool successful = true;
-		if (uncompressedSize != sampleSize)
-		{
-			cerr << "LZW COMPRESSION ERROR! Size mismatch" << endl;
-			successful = false;
-		}
-		if (memcmp(uncompressedData, sampleData, sampleSize) != 0)
-		{
-			cerr << "LZW COMPRESSION ERROR! Data corrupted" << endl;
-			successful = false;
-		}
-
-		if (successful)
-		{
-			cout << "LZW compression/decompression lossless" << endl;
-
-			string compPathLZW = "compression_results/compressedLZW";
-			cout << "Check " << compPathLZW << " to see the LZW compression result." << endl;
-
-			ofstream compHuffmanFile;
-			compHuffmanFile.open(compPathLZW);
-			compHuffmanFile << compressedData << endl;
-			compHuffmanFile.close();
-		}
+		sampleSize = inImage.rows * inImage.cols * 3; // 3 CHANNELS (RGB)
 	}
 	else
 	{
-		cout << "Error while compressing" << endl;
+		inImage = cv::imread(path, cv::IMREAD_GRAYSCALE);
+
+		sampleData = (uint8_t *)inImage.data;
+
+		sampleSize = inImage.rows * inImage.cols; // 1 CHANNEL (gris)
 	}
 
-	string uncompPathLZW = "compression_results/uncompressedLZW.png";
-	cout << "Check " << uncompPathLZW << " to see the decompression result." << endl;
+	// =================== Compression Huffman =========================
+	double time_huff_c{0};
+	double time_huff_d{0};
+	int taille_huff = compute_huffman((uint8_t*) sampleData, sampleSize, &time_huff_c, &time_huff_d);
+	double taux_huff = calcTaux(taille_huff, sampleSize);
 
-	cv::Mat outImageLZW = cv::Mat(inImage.rows, inImage.cols, CV_8UC3, (uchar *)uncompressedData);
-	imwrite(uncompPathLZW, outImageLZW);
+	// Save results in struct
+	results huff_res {
+		time_huff_c,
+		time_huff_d,
+		taille_huff,
+		taux_huff
+	};
 
-	// cv::Mat noise = cv::Mat(outImageLZW.size(), CV_8UC3);
-	// cv::randn(noise, 32, 4);
+	// =================== Compression LZW =============================
+	double time_lzw_c{0};
+	double time_lzw_d{0};
+	int taille_lzw = compute_lzw((uint8_t*) sampleData, sampleSize, &time_lzw_c, &time_lzw_d);
+	double taux_lzw = calcTaux(taille_lzw, sampleSize);
 
-	// cv::Mat imageBruitee = outImageLZW + noise;
+	// Save results in struct
+	results lzw_res {
+		time_lzw_c,
+		time_lzw_d,
+		taille_lzw,
+		taux_lzw
+	};
 
-	// imwrite("lena_bruit.png", imageBruitee);
 
-	delete[] uncompressedData;
-	LZW_MFREE(compressedData);
+	// string compPathLZW = "compression_results/compressedLZW";
+	// cout << "Check " << compPathLZW << " to see the LZW compression result." << endl;
+	//
+	// ofstream compHuffmanFile;
+	// compHuffmanFile.open(compPathLZW);
+	// compHuffmanFile << compressedData << endl;
+	// compHuffmanFile.close();
+    //
+	// string uncompPathLZW = "compression_results/uncompressedLZW.png";
+	// cout << "Check " << uncompPathLZW << " to see the decompression result." << endl;
+    //
+	// cv::Mat outImageLZW = cv::Mat(inImage.rows, inImage.cols, CV_8UC3, (uchar *)uncompressedData);
+	// imwrite(uncompPathLZW, outImageLZW);
+	//
+	// cv::Mat noise = cv::Mat(inImage.size(), CV_8UC3);
+	// float m = (10, 12, 34);
+	// float sigma = (1, 5, 50);
+	// cv::randn(noise, m, sigma);
+
+	// cv::Mat imageBruitee = inImage + noise;
+
+	// imwrite("samples/res.png", inImage);
+	// cout << inImage << endl;
+
+	// =================== Post Processing =========================
+	output_res(&sampleSize, &huff_res, &lzw_res);
 }

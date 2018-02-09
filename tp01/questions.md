@@ -9,16 +9,18 @@
 # Question 02: Methodologie
 ### La methode
 * Pour chaque fichier dans notre base de donnees, on va compresser avec les deux types de codages, c'est a dire Huffman et LZW, et comparer le taux de compression et la vitesse de compression pour les deux fichiers en output.
+
 ### La base de donnees
-* On aura des fichiers de texte avec differentes longueurs de deux types:
-	* avec du texte comprehensible
-	* avec un ensemble aleatoire de symboles
-* On aura des images de differentes tailles de trois types:
+* On aura des fichiers de texte avec differentes longueurs des types suivant:
+	* Du texte comprehensible
+	* Un ensemble aleatoire de symboles,
+	* Des fichiers logs
+* On aura des images de differentes tailles des types suivant:
+	* Des photographiesen couleurs
 	* Des photographies noir et blanc
 	* Des images monochromes
 	* Des images bruitees
 	* Des images type 8-bit (identicons, 8bit art, etc)
-* On aura des GIFs de differentes longueurs.
 
 ### Les criteres
 * Les codes seront compares selon le taux de compression, celui avec le taux le plus eleve est considere meilleur pour cette tache.
