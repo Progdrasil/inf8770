@@ -2,13 +2,17 @@ CC := g++
 CPPFLAGS := -Wall -g -std=c++11 -Iinclude -Iinclude/compression
 LDFLAGS := -lopencv_core -lopencv_imgcodecs -lboost_program_options -lboost_filesystem -lboost_system
 
-all: clean tp
+SRCS := $(wildcard *.cpp)
+OBJS := $(patsubst %.cpp,%.o,$(SRCS))
+TARGET := tp
+
+all: clean $(TARGET)
 
 clean:
-	rm -f *.o ./compression_results/*
+	rm -f *.o ./compression_results/* $(TARGET)
 
-tp.o: main.cpp
-	$(CC) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
+%.o: %.cpp
+	$(CC) $(CPPFLAGS) $(INCLUDES) -c $< 
 
-tp: tp.o
-	$(CC) $(LDFLAGS) -o tp tp.o
+$(TARGET): $(OBJS)
+	$(CC) $(LDFLAGS) -o $@ $^

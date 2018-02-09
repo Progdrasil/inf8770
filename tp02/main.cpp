@@ -11,26 +11,12 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
-#include <string>
 #include <iostream>
-#include "conversion.hpp"
+#include "pipeline.hpp"
 
 using namespace std;
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
-
-void code(fs::path path, fs::path save) {
-	save /= path.filename();
-	save.replace_extension(".jpeg");
-
-	cout << "Will read file: " << path.string()
-		 << " and save its compressed form as " << save.string() << endl;
-}
-
-void decode(fs::path path, fs::path save) {
-	cout << "Will read compressed file: " << path.string()
-		 << " and display it" << endl;
-}
 
 int main(int argc, char *argv[]) {
 	fs::path path, save;
