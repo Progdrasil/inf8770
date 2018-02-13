@@ -56,10 +56,10 @@ int main(int argc, char *argv[]) {
 	}
 	else if (vm.count("path")) {
 		if (vm.count("decode")) {
-			decode(path, save);
+			return decode(path, save);
 		}
 		else {
-			code(path, save);
+			return code(path, save);
 		}
 	}
 	else {
