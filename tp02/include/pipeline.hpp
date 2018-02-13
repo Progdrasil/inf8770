@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "conversion.hpp"
+#include "bloc.hpp"
 
 namespace fs = boost::filesystem;
 
