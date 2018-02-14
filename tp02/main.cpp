@@ -22,11 +22,12 @@ int main(int argc, char *argv[]) {
 	fs::path path, save;
 
 	// Declare the supported options
-	po::options_description desc{"Options for homemade JPEG encoder \n"
-									"tp02 [options] <path>"
-								};
+	po::options_description desc{
+		"USAGE: tp [options] <path>\n\n"
+		"Options for homemade JPEG encoder"
+	};
 	desc.add_options()
-		("help,h", "Shows the help message")
+		("help,h", "Shows this useful help message")
 		("path,p", po::value<fs::path>(&path), "Path to the file to code/decode")
 		("save,s", po::value<fs::path>(&save)->default_value("./images/"), "Path to save the compressed file, default is './images/'")
 		("decode,d", "decode specified file and show comparison")
@@ -49,16 +50,20 @@ int main(int argc, char *argv[]) {
 	}
 	po::notify(vm);
 
-	if (vm.count("path")) {
+	if (vm.count("help")) {
+		cout << desc << endl;
+		return 0;
+	}
+	else if (vm.count("path")) {
 		if (vm.count("decode")) {
-			decode(path, save);
+			return decode(path, save);
 		}
 		else {
-			code(path, save);
+			return code(path, save);
 		}
 	}
 	else {
-		cout << "Must specify the path to the input file!" << endl;
+		cout << "ERROR: Must specify the path to the input file!" << endl;
 		cout << desc << endl;
 		return -1;
 	}

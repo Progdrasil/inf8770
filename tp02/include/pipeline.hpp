@@ -5,10 +5,12 @@
 #include <iostream>
 
 #include "conversion.hpp"
+#include "bloc.hpp"
 
 namespace fs = boost::filesystem;
 
-void code(fs::path path, fs::path save);
-void decode(fs::path path, fs::path save);
+int code(fs::path path, fs::path save);
+int decode(fs::path path, fs::path save);
+void dispImg(cv::Mat &image);
 
 #endif
