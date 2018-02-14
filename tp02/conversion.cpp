@@ -45,11 +45,7 @@ void ycbcr2bgr(cv::Mat& yIn, cv::Mat& cbIn, cv::Mat& crIn, cv::Mat& bgrOut)
 	{
 		for (int j = 0; j < colsIn; j++)
 		{
-<<<<<<< HEAD
-			ycrcbOut.at<cv::Vec3b>(i, j)[0] = yIn.at<uint8_t>(i, j);
-=======
 			ycrcbOut.template at<cv::Vec3b>(i, j)[0] = yIn.template at<uint8_t>(i, j);
->>>>>>> 6fcbc6297a835e5694faa56d7ef31c7bba390ac5
 
 			int x, y;
 			if (i % 2 != 0)
@@ -62,13 +58,8 @@ void ycbcr2bgr(cv::Mat& yIn, cv::Mat& cbIn, cv::Mat& crIn, cv::Mat& bgrOut)
 			else
 				y = j / 2;
 
-<<<<<<< HEAD
-			ycrcbOut.at<cv::Vec3b>(i, j)[1] = crIn.at<uint8_t>(x, y);
-			ycrcbOut.at<cv::Vec3b>(i, j)[2] = cbIn.at<uint8_t>(x, y);
-=======
 			ycrcbOut.template at<cv::Vec3b>(i, j)[1] = crIn.template at<uint8_t>(x, y);
 			ycrcbOut.template at<cv::Vec3b>(i, j)[2] = cbIn.template at<uint8_t>(x, y);
->>>>>>> 6fcbc6297a835e5694faa56d7ef31c7bba390ac5
 		}
 	}
 
