@@ -11,6 +11,6 @@ namespace fs = boost::filesystem;
 
 int code(fs::path path, fs::path save);
 int decode(fs::path path, fs::path save);
-void dispImg(cv::Mat &image);
+void dispImg(std::string message, cv::Mat &image);
 
 #endif

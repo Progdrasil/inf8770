@@ -43,7 +43,7 @@ int decode(fs::path path, fs::path save) {
 	return 0;
 }
 
-void dispImg(string &message, cv::Mat &image) {
+void dispImg(string message, cv::Mat &image) {
 	// Create a window for display.
 	cv::namedWindow( message, cv::WINDOW_AUTOSIZE );
 
