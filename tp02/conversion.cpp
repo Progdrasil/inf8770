@@ -11,9 +11,9 @@ void bgr2ycbcr(cv::Mat &bgrIn, cv::Mat &yOut, cv::Mat &cbOut, cv::Mat &crOut)
 	cv::Mat ycrcbIn;
     cv::cvtColor(bgrIn, ycrcbIn, cv::COLOR_BGR2YCrCb);
 
-	yOut.create(sizeIn, cv::CV_8UC1);
-	cbOut.create(rowsIn / 2, colsIn / 2, cv::CV_8UC1);
-	crOut.create(rowsIn / 2, colsIn / 2, cv::CV_8UC1);
+	yOut.create(sizeIn, CV_8UC1);
+	cbOut.create(rowsIn / 2, colsIn / 2, CV_8UC1);
+	crOut.create(rowsIn / 2, colsIn / 2, CV_8UC1);
 
 	for (int i = 0; i < rowsIn; i++)
 	{
@@ -39,13 +39,13 @@ void ycbcr2bgr(cv::Mat& yIn, cv::Mat& cbIn, cv::Mat& crIn, cv::Mat& bgrOut)
 
 	cv::Mat ycrcbOut;
 
-	ycrcbOut.create(sizeIn, cv::CV_8UC3);
+	ycrcbOut.create(sizeIn, CV_8UC3);
 
 	for (int i = 0; i < rowsIn; i++)
 	{
 		for (int j = 0; j < colsIn; j++)
 		{
-			ycrcbOut.at<cv::Vec3b>(i, j)[0] = yOut.at<uint8_t>(i, j);
+			ycrcbOut.at<cv::Vec3b>(i, j)[0] = yIn.at<uint8_t>(i, j);
 
 			int x, y;
 			if (i % 2 != 0)
@@ -58,8 +58,8 @@ void ycbcr2bgr(cv::Mat& yIn, cv::Mat& cbIn, cv::Mat& crIn, cv::Mat& bgrOut)
 			else
 				y = j / 2;
 
-			ycrcbOut.at<cv::Vec3b>(i, j)[1] = crOut.at<uint8_t>(x, y);
-			ycrcbOut.at<cv::Vec3b>(i, j)[2] = cbOut.at<uint8_t>(x, y);
+			ycrcbOut.at<cv::Vec3b>(i, j)[1] = crIn.at<uint8_t>(x, y);
+			ycrcbOut.at<cv::Vec3b>(i, j)[2] = cbIn.at<uint8_t>(x, y);
 		}
 	}
 
