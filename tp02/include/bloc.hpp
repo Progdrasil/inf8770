@@ -5,6 +5,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-std::vector<cv::Mat_<uchar>> matrix2block(cv::Mat_<uchar> &inMat);
+std::vector<cv::Mat_<uchar>> matrix2blocks(const cv::Mat_<uchar> &inMat);
+cv::Mat_<uchar> blocks2matrix(const std::vector<cv::Mat_<uchar>> inBlocks, const cv::Size &inImageSize);
 
 #endif

@@ -31,6 +31,7 @@ int main(int argc, char *argv[]) {
 		("path,p", po::value<fs::path>(&path), "Path to the file to code/decode")
 		("save,s", po::value<fs::path>(&save)->default_value("./images/"), "Path to save the compressed file, default is './images/'")
 		("decode,d", "decode specified file and show comparison")
+		("subsampling,y", "Deactivate YCbCr 4:2:0 subsampling")
 	;
 
 	po::positional_options_description p;
@@ -59,7 +60,10 @@ int main(int argc, char *argv[]) {
 			return decode(path, save);
 		}
 		else {
-			return code(path, save);
+			if(vm.count("subsampling"))
+				return code(path, save, false);
+			else
+				return code(path, save, true);
 		}
 	}
 	else {

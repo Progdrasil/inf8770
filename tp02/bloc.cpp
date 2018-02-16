@@ -1,6 +1,6 @@
 #include "bloc.hpp"
 
-std::vector<cv::Mat_<uchar>> matrix2block(cv::Mat_<uchar> &inMat)
+std::vector<cv::Mat_<uchar>> matrix2blocks(const cv::Mat_<uchar> &inMat)
 {
 	std::vector<cv::Mat_<uchar>> outBlocks;
 
@@ -18,4 +18,21 @@ std::vector<cv::Mat_<uchar>> matrix2block(cv::Mat_<uchar> &inMat)
 	}
 
 	return outBlocks;
+}
+
+cv::Mat_<uchar> blocks2matrix(const std::vector<cv::Mat_<uchar>> inBlocks, const cv::Size &inImageSize)
+{
+	cv::Mat_<uchar> outMatrix(inImageSize);
+
+	int nBlock = 0;
+	for (int i = 0; i < outMatrix.rows; i += 8)
+	{
+		for (int j = 0; j < outMatrix.cols; j += 8)
+		{
+			cv::Mat sub = outMatrix.rowRange(i, i + 8).colRange(j, j + 8);
+			inBlocks[nBlock++].copyTo(sub);
+		}
+	}
+
+	return outMatrix;
 }
