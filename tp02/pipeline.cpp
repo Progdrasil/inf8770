@@ -44,9 +44,9 @@ int code(fs::path path, fs::path save, bool subsampling) {
 	cv::Mat_<uchar> cb2 = blocks2matrix(blocksCb2, cb.size());
 	cv::Mat_<uchar> cr2 = blocks2matrix(blocksCr2, cr.size());
 
-	// dispImg("Y", y);
-	// dispImg("Cb", cb);
-	// dispImg("Cr", cr);
+	// dispImg("Y", y2);
+	// dispImg("Cb", cb2);
+	// dispImg("Cr", cr2);
 
 	cv::Mat bgrOut = ycbcr2bgr(y2, cb2, cr2);
 

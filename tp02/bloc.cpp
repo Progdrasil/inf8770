@@ -36,3 +36,20 @@ cv::Mat_<uchar> blocks2matrix(const std::vector<cv::Mat_<uchar>> inBlocks, const
 
 	return outMatrix;
 }
+
+cv::Mat_<float> blocks2matrix(const std::vector<cv::Mat_<float>> inBlocks, const cv::Size &inImageSize)
+{
+	cv::Mat_<float> outMatrix(inImageSize);
+
+	int nBlock = 0;
+	for (int i = 0; i < outMatrix.rows; i += 8)
+	{
+		for (int j = 0; j < outMatrix.cols; j += 8)
+		{
+			cv::Mat sub = outMatrix.rowRange(i, i + 8).colRange(j, j + 8);
+			inBlocks[nBlock++].copyTo(sub);
+		}
+	}
+
+	return outMatrix;
+}

@@ -5,7 +5,9 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-std::vector<cv::Mat_<float>> block2dct(std::vector<cv::Mat_<uchar>> &inBlocks);
-cv::Mat_<float> dct(cv::Mat_<uchar> inBlock);
+std::vector<cv::Mat_<float>> blocks2dct(const std::vector<cv::Mat_<uchar>> &inBlocks);
+std::vector<cv::Mat_<uchar>> dct2blocks(const std::vector<cv::Mat_<float>> &inDct);
+cv::Mat_<float> dct(const cv::Mat_<uchar> inBlock);
+cv::Mat_<uchar> invdct(const cv::Mat_<float> inDct);
 
 #endif
