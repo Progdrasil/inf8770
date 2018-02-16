@@ -11,7 +11,7 @@ int code(fs::path path, fs::path save) {
 
 	// Load image in
 	cv::Mat bgr = cv::imread(path.string(), CV_LOAD_IMAGE_COLOR);
-	cv::Mat y, cb, cr;
+	cv::Mat_<uchar> y, cb, cr;
 
 	if(! bgr.data)
     {
@@ -33,6 +33,8 @@ int code(fs::path path, fs::path save) {
 	dispImg("Cb", cb);
 	dispImg("Cr", cr);
 
+	// Wait for a keystroke in the window
+	cv::waitKey(0);
 	return 0;
 }
 
@@ -49,7 +51,4 @@ void dispImg(string message, cv::Mat &image) {
 
 	// Show our image inside it.
 	cv::imshow( message, image );
-
-	// Wait for a keystroke in the window
-	cv::waitKey(0);
 }
