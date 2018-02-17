@@ -7,6 +7,7 @@
 #include "conversion.hpp"
 #include "bloc.hpp"
 #include "dct.hpp"
+#include "quantification.hpp"
 
 namespace fs = boost::filesystem;
 

@@ -41,9 +41,17 @@ int code(fs::path path, fs::path save, bool subsampling) {
 	std::vector<cv::Mat_<float>> dctCb = blocks2dct(blocksCb);
 	std::vector<cv::Mat_<float>> dctCr = blocks2dct(blocksCr);
 
-	std::vector<cv::Mat_<uchar>> blocksY2 = dct2blocks(dctY);
-	std::vector<cv::Mat_<uchar>> blocksCb2 = dct2blocks(dctCb);
-	std::vector<cv::Mat_<uchar>> blocksCr2 = dct2blocks(dctCr);
+	std::vector<cv::Mat_<signed char>> quantifY = quantification(dctY);
+	std::vector<cv::Mat_<signed char>> quantifCb = quantification(dctCb);
+	std::vector<cv::Mat_<signed char>> quantifCr = quantification(dctCr);
+
+	std::vector<cv::Mat_<float>> inv_quantifY = inv_quantification(quantifY);
+	std::vector<cv::Mat_<float>> inv_quantifCb = inv_quantification(quantifCb);
+	std::vector<cv::Mat_<float>> inv_quantifCr = inv_quantification(quantifCr);
+
+	std::vector<cv::Mat_<uchar>> blocksY2 = dct2blocks(inv_quantifY);
+	std::vector<cv::Mat_<uchar>> blocksCb2 = dct2blocks(inv_quantifCb);
+	std::vector<cv::Mat_<uchar>> blocksCr2 = dct2blocks(inv_quantifCr);
 
 	cv::Mat_<uchar> y2 = blocks2matrix(blocksY2, y.size());
 	cv::Mat_<uchar> cb2 = blocks2matrix(blocksCb2, cb.size());
