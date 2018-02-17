@@ -34,6 +34,8 @@ cv::Mat_<float> dct(const cv::Mat_<uchar> inBlock)
             if (v != 0)
                 cv *= sqrt(2);
 
+            outDct.at<float>(u, v) = 0;
+
             for (int x = 0; x < n; x++)
             {
                 for (int y = 0; y < n; y++)
@@ -42,9 +44,11 @@ cv::Mat_<float> dct(const cv::Mat_<uchar> inBlock)
                     float cosYV = cos(CV_PI * (2.f * y + 1.f) * v / (2.f * n));
                     float f = inBlock.at<uchar>(x, y);
 
-                    outDct.at<float>(u, v) += cu * cv * f * cosXU * cosYV;
+                    outDct.at<float>(u, v) += f * cosXU * cosYV;
                 }
             }
+
+            outDct.at<float>(u, v) *= cu * cv;
         }
     }
     return outDct;
@@ -74,7 +78,7 @@ cv::Mat_<uchar> invdct(const cv::Mat_<float> inDct)
     {
         for (int y = 0; y < n; y++)
         {
-            outBlocks.at<uchar>(x, y) = 0;
+            float tmpval = 0.f;
             for (int u = 0; u < n; u++)
             {
                 for (int v = 0; v < n; v++)
@@ -87,15 +91,14 @@ cv::Mat_<uchar> invdct(const cv::Mat_<float> inDct)
                     if (v != 0)
                         cv *= sqrt(2);
 
-                    float cosXU = cos(CV_PI * (2.f * x + 1.f) * u / (2.f * n));
-                    float cosYV = cos(CV_PI * (2.f * y + 1.f) * v / (2.f * n));
+                    double cosXU = cos(CV_PI * (2.f * x + 1.f) * u / (2.f * n));
+                    double cosYV = cos(CV_PI * (2.f * y + 1.f) * v / (2.f * n));
                     float c = inDct.at<float>(u, v);
 
-                    outBlocks.at<uchar>(x, y) += cu * cv * c* cosXU * cosYV;
-                    if (outBlocks.at<uchar>(x, y) > 255)
-                        std::cout << "Overflow" << std::endl;
+                    tmpval += cu * cv * c * cosXU * cosYV;
                 }
             }
+            outBlocks.at<uchar>(x, y) = tmpval;
         }
     }
     return outBlocks;

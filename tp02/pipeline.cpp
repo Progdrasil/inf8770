@@ -18,6 +18,11 @@ int code(fs::path path, fs::path save, bool subsampling) {
         cout <<  "Could not open or find the image" << endl ;
         return -1;
     }
+	else if (bgr.rows % 8 != 0 && bgr.cols % 8 != 0)
+	{
+		cout << "Height and width of the image must be multiples of 8" << endl;
+	}
+	// cout << "Height of the image " << bgr.rows << ", width of the image " << bgr.cols << endl;
 
 	dispImg("Original image", bgr);
 
@@ -44,9 +49,13 @@ int code(fs::path path, fs::path save, bool subsampling) {
 	cv::Mat_<uchar> cb2 = blocks2matrix(blocksCb2, cb.size());
 	cv::Mat_<uchar> cr2 = blocks2matrix(blocksCr2, cr.size());
 
-	// dispImg("Y", y2);
-	// dispImg("Cb", cb2);
-	// dispImg("Cr", cr2);
+	// dispImg("Y", y);
+	// dispImg("Cb", cb);
+	// dispImg("Cr", cr);
+
+	// dispImg("Y after DCT", y2);
+	// dispImg("Cb after DCT", cb2);
+	// dispImg("Cr after DCT", cr2);
 
 	cv::Mat bgrOut = ycbcr2bgr(y2, cb2, cr2);
 
@@ -54,9 +63,11 @@ int code(fs::path path, fs::path save, bool subsampling) {
 
 	if(subsampling)
 	{
-		cv::Mat diffNorm;
-		cv::normalize(bgr-bgrOut, diffNorm, 0.f, 255.f, cv::NORM_MINMAX);
-		dispImg("Subsampling differences (normalized min-max)", diffNorm);
+		cv::Mat diff = bgr-bgrOut;
+		dispImg("Differences original/decompressed", diff);
+		// cv::Mat diffNorm;
+		// cv::normalize(bgr-bgrOut, diffNorm, 0.f, 255.f, cv::NORM_MINMAX);
+		// dispImg("Subsampling differences (normalized min-max)", diffNorm);
 
 		// cv::Mat diffBlocks;
 		// cv::normalize(y - y2, diffBlocks, 0.f, 255.f, cv::NORM_MINMAX);
