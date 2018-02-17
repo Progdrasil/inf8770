@@ -12,7 +12,7 @@ TARGET := tp
 all: clean $(TARGET)
 
 clean:
-	rm -f *.o ./compression_results/* $(TARGET)
+	rm -f $(OBJ_DIR)/*.o $(TARGET)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CC) $(CPPFLAGS) $(INCLUDES) -c -o $@ $<

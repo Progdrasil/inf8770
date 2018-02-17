@@ -5,7 +5,15 @@
 // #include <opencv2/highgui/highgui.hpp>
 // #include <opencv2/imgproc/imgproc.hpp>
 
-std::vector<cv::Mat_<signed char>> quantification(const std::vector<cv::Mat_<float>> &inDct);
-std::vector<cv::Mat_<float>> inv_quantification(const std::vector<cv::Mat_<signed char>> &inQuantif);
+extern const cv::Mat_<uchar> basicQuantif;
+
+enum quantificationLevel {
+    NoQuantification,
+    BasicQuantification,
+    DoubleQuantification
+};
+
+std::vector<cv::Mat_<int>> quantification(const std::vector<cv::Mat_<float>> &inDct, int level);
+std::vector<cv::Mat_<float>> inv_quantification(const std::vector<cv::Mat_<int>> &inQuantif, int level);
 
 #endif

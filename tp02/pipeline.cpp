@@ -2,7 +2,8 @@
 
 using namespace std;
 
-int code(fs::path path, fs::path save, bool subsampling) {
+int code(fs::path path, fs::path save, bool subsampling, uint quantifLevel)
+{
 	save /= path.filename();
 	save.replace_extension(".jpeg");
 
@@ -41,13 +42,13 @@ int code(fs::path path, fs::path save, bool subsampling) {
 	std::vector<cv::Mat_<float>> dctCb = blocks2dct(blocksCb);
 	std::vector<cv::Mat_<float>> dctCr = blocks2dct(blocksCr);
 
-	std::vector<cv::Mat_<signed char>> quantifY = quantification(dctY);
-	std::vector<cv::Mat_<signed char>> quantifCb = quantification(dctCb);
-	std::vector<cv::Mat_<signed char>> quantifCr = quantification(dctCr);
+	std::vector<cv::Mat_<int>> quantifY = quantification(dctY, quantifLevel);
+	std::vector<cv::Mat_<int>> quantifCb = quantification(dctCb, quantifLevel);
+	std::vector<cv::Mat_<int>> quantifCr = quantification(dctCr, quantifLevel);
 
-	std::vector<cv::Mat_<float>> inv_quantifY = inv_quantification(quantifY);
-	std::vector<cv::Mat_<float>> inv_quantifCb = inv_quantification(quantifCb);
-	std::vector<cv::Mat_<float>> inv_quantifCr = inv_quantification(quantifCr);
+	std::vector<cv::Mat_<float>> inv_quantifY = inv_quantification(quantifY, quantifLevel);
+	std::vector<cv::Mat_<float>> inv_quantifCb = inv_quantification(quantifCb, quantifLevel);
+	std::vector<cv::Mat_<float>> inv_quantifCr = inv_quantification(quantifCr, quantifLevel);
 
 	std::vector<cv::Mat_<uchar>> blocksY2 = dct2blocks(inv_quantifY);
 	std::vector<cv::Mat_<uchar>> blocksCb2 = dct2blocks(inv_quantifCb);

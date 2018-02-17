@@ -20,6 +20,7 @@ namespace fs = boost::filesystem;
 
 int main(int argc, char *argv[]) {
 	fs::path path, save;
+	uint quantif;
 
 	// Declare the supported options
 	po::options_description desc{
@@ -27,11 +28,12 @@ int main(int argc, char *argv[]) {
 		"Options for homemade JPEG encoder"
 	};
 	desc.add_options()
-		("help,h", "Shows this useful help message")
-		("path,p", po::value<fs::path>(&path), "Path to the file to code/decode")
-		("save,s", po::value<fs::path>(&save)->default_value("./images/"), "Path to save the compressed file, default is './images/'")
-		("decode,d", "decode specified file and show comparison")
-		("subsampling,y", "Deactivate YCbCr 4:2:0 subsampling")
+	("help,h", "Shows this useful help message")
+	("path,p", po::value<fs::path>(&path), "Path to the file to code/decode")
+	("save,s", po::value<fs::path>(&save)->default_value("./images/"), "Path to save the compressed file, default is './images/'")
+	("decode,d", "decode specified file and show comparison")
+	("noSubsampling,y", "Deactivate YCbCr 4:2:0 subsampling")
+	("quantification,q", po::value<uint>(&quantif)->default_value(1), "Specify level of quantification to use")
 	;
 
 	po::positional_options_description p;
@@ -40,7 +42,6 @@ int main(int argc, char *argv[]) {
 	po::variables_map vm;
 
 	try {
-
 		po::store(po::command_line_parser(argc, argv).
 					options(desc).positional(p).run(), vm);
 	}
@@ -60,10 +61,8 @@ int main(int argc, char *argv[]) {
 			return decode(path, save);
 		}
 		else {
-			if(vm.count("subsampling"))
-				return code(path, save, false);
-			else
-				return code(path, save, true);
+			bool subsampling = ! vm.count("noSubsampling");
+			return code(path, save, subsampling, quantif);
 		}
 	}
 	else {
