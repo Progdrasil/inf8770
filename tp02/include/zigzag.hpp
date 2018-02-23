@@ -6,6 +6,6 @@
 // #include <opencv2/imgproc/imgproc.hpp>
 
 std::vector<int> blocks2vector(const std::vector<cv::Mat_<int>> &inBlocks);
-std::vector<cv::Mat_<int>> vector2blocks(const std::vector<int> &inVector);
+std::vector<cv::Mat_<int>> vector2blocks(const std::vector<int> &inVector, cv::Size &sizeBlock, uint nbBlocks);
 
 #endif
