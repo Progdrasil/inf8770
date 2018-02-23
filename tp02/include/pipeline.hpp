@@ -8,6 +8,7 @@
 #include "bloc.hpp"
 #include "dct.hpp"
 #include "quantification.hpp"
+#include "zigzag.hpp"
 
 namespace fs = boost::filesystem;
 

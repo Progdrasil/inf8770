@@ -14,11 +14,11 @@ int code(fs::path path, fs::path save, bool subsampling, uint quantifLevel)
 	cv::Mat bgr = cv::imread(path.string(), CV_LOAD_IMAGE_COLOR);
 	cv::Mat_<uchar> y, cb, cr;
 
-	if(! bgr.data)
-    {
-        cout <<  "Could not open or find the image" << endl ;
-        return -1;
-    }
+	if (!bgr.data)
+	{
+		cout << "Could not open or find the image" << endl;
+		return -1;
+	}
 	else if (bgr.rows % 8 != 0 && bgr.cols % 8 != 0)
 	{
 		cout << "Height and width of the image must be multiples of 8" << endl;
@@ -29,10 +29,10 @@ int code(fs::path path, fs::path save, bool subsampling, uint quantifLevel)
 
 	// convert BGR to YCbCr
 	bgr2ycbcr(bgr, y, cb, cr, subsampling);
-	if(!y.data || !cb.data || !cr.data)
-    {
-        cout <<  "Could not convert the image to YCbCr" << endl ;
-        return -1;
+	if (!y.data || !cb.data || !cr.data)
+	{
+		cout << "Could not convert the image to YCbCr" << endl;
+		return -1;
 	}
 	std::vector<cv::Mat_<uchar>> blocksY = matrix2blocks(y);
 	std::vector<cv::Mat_<uchar>> blocksCb = matrix2blocks(cb);
@@ -45,6 +45,8 @@ int code(fs::path path, fs::path save, bool subsampling, uint quantifLevel)
 	std::vector<cv::Mat_<int>> quantifY = quantification(dctY, quantifLevel);
 	std::vector<cv::Mat_<int>> quantifCb = quantification(dctCb, quantifLevel);
 	std::vector<cv::Mat_<int>> quantifCr = quantification(dctCr, quantifLevel);
+
+	std::vector<int> zigzagY = blocks2vector(quantifY);
 
 	std::vector<cv::Mat_<float>> inv_quantifY = inv_quantification(quantifY, quantifLevel);
 	std::vector<cv::Mat_<float>> inv_quantifCb = inv_quantification(quantifCb, quantifLevel);
@@ -70,9 +72,9 @@ int code(fs::path path, fs::path save, bool subsampling, uint quantifLevel)
 
 	dispImg("Decompression result", bgrOut);
 
-	if(subsampling)
+	if (subsampling)
 	{
-		cv::Mat diff = bgr-bgrOut;
+		cv::Mat diff = bgr - bgrOut;
 		dispImg("Differences original/decompressed", diff);
 		// cv::Mat diffNorm;
 		// cv::normalize(bgr-bgrOut, diffNorm, 0.f, 255.f, cv::NORM_MINMAX);
@@ -88,17 +90,19 @@ int code(fs::path path, fs::path save, bool subsampling, uint quantifLevel)
 	return 0;
 }
 
-int decode(fs::path path, fs::path save) {
+int decode(fs::path path, fs::path save)
+{
 	cout << "Will read compressed file: " << path.string()
 		 << " and display it" << endl;
 
 	return 0;
 }
 
-void dispImg(string message, cv::Mat &image) {
+void dispImg(string message, cv::Mat &image)
+{
 	// Create a window for display.
-	cv::namedWindow( message, cv::WINDOW_AUTOSIZE );
+	cv::namedWindow(message, cv::WINDOW_AUTOSIZE);
 
 	// Show our image inside it.
-	cv::imshow( message, image );
+	cv::imshow(message, image);
 }

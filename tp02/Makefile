@@ -9,7 +9,7 @@ OBJS := $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 
 TARGET := tp
 
-all: clean $(TARGET)
+all: $(TARGET)
 
 clean:
 	rm -f $(OBJ_DIR)/*.o $(TARGET)
