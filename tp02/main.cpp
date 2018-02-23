@@ -19,8 +19,8 @@ namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
 int main(int argc, char *argv[]) {
-	fs::path path, save;
-	uint quantif;
+	fs::path path;
+	uint quantifLevel;
 
 	// Declare the supported options
 	po::options_description desc{
@@ -30,10 +30,8 @@ int main(int argc, char *argv[]) {
 	desc.add_options()
 	("help,h", "Shows this useful help message")
 	("path,p", po::value<fs::path>(&path), "Path to the file to code/decode")
-	("save,s", po::value<fs::path>(&save)->default_value("./images/"), "Path to save the compressed file, default is './images/'")
-	("decode,d", "decode specified file and show comparison")
 	("noSubsampling,y", "Deactivate YCbCr 4:2:0 subsampling")
-	("quantification,q", po::value<uint>(&quantif)->default_value(1), "Specify level of quantification to use")
+	("quantification,q", po::value<uint>(&quantifLevel)->default_value(1), "Specify level of quantification to use")
 	;
 
 	po::positional_options_description p;
@@ -57,12 +55,18 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 	else if (vm.count("path")) {
-		if (vm.count("decode")) {
-			return decode(path, save);
+		bool subsampling = ! vm.count("noSubsampling");
+		std::vector<cv::Mat_<int>> quantif;
+		std::vector<cv::Size> ycbcrSize;
+		std::vector<uint> lineSizes;
+		int codeRes = code(path, subsampling, quantifLevel, &quantif, &ycbcrSize, &lineSizes);
+		if (codeRes != 0) {
+			return codeRes;
 		}
-		else {
-			bool subsampling = ! vm.count("noSubsampling");
-			return code(path, save, subsampling, quantif);
+
+		int decodeRes = decode(quantif, quantifLevel, ycbcrSize, lineSizes);
+		if (decodeRes != 0) {
+			return decodeRes;
 		}
 	}
 	else {
