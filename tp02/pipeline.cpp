@@ -42,13 +42,15 @@ int code(fs::path path, fs::path save, bool subsampling, uint quantifLevel)
 	std::vector<cv::Mat_<float>> dctCb = blocks2dct(blocksCb);
 	std::vector<cv::Mat_<float>> dctCr = blocks2dct(blocksCr);
 
-	std::vector<cv::Mat_<int>> quantifY = quantification(dctY, quantifLevel);
-	std::vector<cv::Mat_<int>> quantifCb = quantification(dctCb, quantifLevel);
-	std::vector<cv::Mat_<int>> quantifCr = quantification(dctCr, quantifLevel);
+	std::vector<cv::Mat_<char>> quantifY = quantification(dctY, quantifLevel);
+	std::vector<cv::Mat_<char>> quantifCb = quantification(dctCb, quantifLevel);
+	std::vector<cv::Mat_<char>> quantifCr = quantification(dctCr, quantifLevel);
 
-	std::vector<int> zigzagY = blocks2vector(quantifY);
+	std::vector<char> zigzagY = blocks2vector(quantifY);
+	cv::Size matSize = quantifY[0].size();
+	std::vector<cv::Mat_<char>> quantifYreconst = vector2blocks(zigzagY, matSize, quantifY.size());
 
-	std::vector<cv::Mat_<float>> inv_quantifY = inv_quantification(quantifY, quantifLevel);
+	std::vector<cv::Mat_<float>> inv_quantifY = inv_quantification(quantifYreconst, quantifLevel);
 	std::vector<cv::Mat_<float>> inv_quantifCb = inv_quantification(quantifCb, quantifLevel);
 	std::vector<cv::Mat_<float>> inv_quantifCr = inv_quantification(quantifCr, quantifLevel);
 

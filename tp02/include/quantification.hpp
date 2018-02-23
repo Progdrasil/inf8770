@@ -13,7 +13,7 @@ enum quantificationLevel {
     DoubleQuantification
 };
 
-std::vector<cv::Mat_<int>> quantification(const std::vector<cv::Mat_<float>> &inDct, int level);
-std::vector<cv::Mat_<float>> inv_quantification(const std::vector<cv::Mat_<int>> &inQuantif, int level);
+std::vector<cv::Mat_<char>> quantification(const std::vector<cv::Mat_<float>> &inDct, int level);
+std::vector<cv::Mat_<float>> inv_quantification(const std::vector<cv::Mat_<char>> &inQuantif, int level);
 
 #endif

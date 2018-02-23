@@ -1,11 +1,11 @@
 #include "zigzag.hpp"
 
-std::vector<int> blocks2vector(const std::vector<cv::Mat_<int>> &inBlocks)
+std::vector<char> blocks2vector(const std::vector<cv::Mat_<char>> &inBlocks)
 {
     cv::Size sizeBlock = inBlocks[0].size();
     CV_Assert(sizeBlock.height == sizeBlock.width);
     int blockSize = sizeBlock.height;
-    std::vector<int> zigzag;
+    std::vector<char> zigzag;
     zigzag.reserve(inBlocks.size() * sizeBlock.width * sizeBlock.height);
 
     for (uint b = 0; b < inBlocks.size(); b++)
@@ -20,23 +20,23 @@ std::vector<int> blocks2vector(const std::vector<cv::Mat_<int>> &inBlocks)
             for (; j <= s && j < blockSize; j++)
             {
                 if (s % 2 == 0)
-                    zigzag.push_back(inBlocks[b].at<int>(s - j, j));
+                    zigzag.push_back(inBlocks[b].at<char>(s - j, j));
                 else
-                    zigzag.push_back(inBlocks[b].at<int>(j, s - j));
+                    zigzag.push_back(inBlocks[b].at<char>(j, s - j));
             }
         }
     }
     return zigzag;
 }
 
-std::vector<cv::Mat_<int>> vector2blocks(const std::vector<int> &inVector, cv::Size &sizeBlock, uint nbBlocks)
+std::vector<cv::Mat_<char>> vector2blocks(const std::vector<char> &inVector, cv::Size &sizeBlock, uint nbBlocks)
 {
-    std::vector<cv::Mat_<int>> outBlocks;
+    std::vector<cv::Mat_<char>> outBlocks;
     outBlocks.reserve(nbBlocks);
 
     for (uint b = 0; b < nbBlocks; b++)
     {
-        cv::Mat_<int> block(sizeBlock);
+        cv::Mat_<char> block(sizeBlock);
         int blockSize = sizeBlock.height;
 
         int index = 0;
@@ -51,11 +51,11 @@ std::vector<cv::Mat_<int>> vector2blocks(const std::vector<int> &inVector, cv::S
                 int indexVector = b * blockSize * blockSize + index++;
                 if (s & 1)
                 {
-                    block.at<int>(j, s - j) = inVector[indexVector];
+                    block.at<char>(j, s - j) = inVector[indexVector];
                 }
                 else
                 {
-                    block.at<int>(s - j, j) = inVector[indexVector];
+                    block.at<char>(s - j, j) = inVector[indexVector];
                 }
             }
         }
