@@ -1,5 +1,4 @@
 #include "dct.hpp"
-#include <iostream>
 
 std::vector<cv::Mat_<float>> blocks2dct(const std::vector<cv::Mat_<uchar>> &inBlocks)
 {

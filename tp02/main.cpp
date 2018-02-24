@@ -9,6 +9,7 @@
 	Modifie le: 26/01/2018
 *******************************************************************************/
 
+
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <iostream>
@@ -59,15 +60,15 @@ int main(int argc, char *argv[]) {
 		std::vector<cv::Mat_<char>> quantif;
 		std::vector<cv::Size> ycbcrSize;
 		std::vector<uint> lineSizes;
-		int codeRes = code(path, subsampling, quantifLevel, &quantif, &ycbcrSize, &lineSizes);
+		int codeRes = code(path, subsampling, quantifLevel, quantif, &ycbcrSize, &lineSizes);
 		if (codeRes != 0) {
 			return codeRes;
 		}
 
-		int decodeRes = decode(quantif, quantifLevel, ycbcrSize, lineSizes);
-		if (decodeRes != 0) {
-			return decodeRes;
-		}
+		// int decodeRes = decode(quantif, quantifLevel, ycbcrSize, lineSizes);
+		// if (decodeRes != 0) {
+		// 	return decodeRes;
+		// }
 	}
 	else {
 		cout << "ERROR: Must specify the path to the input file!" << endl;
