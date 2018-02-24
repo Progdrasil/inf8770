@@ -12,10 +12,10 @@
 
 namespace fs = boost::filesystem;
 
-int code(fs::path path, bool subsampling, uint quantifLevel, std::vector<cv::Mat_<char>> & quantif, std::vector<cv::Size> * oSize, std::vector<uint> * lineSizes);
-int decode(std::vector<cv::Mat_<char>> quantif, uint quantifLevel, std::vector<cv::Size> oSize, std::vector<uint> lineSizes);
+int code(fs::path path, bool subsampling, uint quantifLevel, uint8_t **huffmanData, std::vector<cv::Size> &oSize, std::vector<uint> &lineSizes, std::vector<int> &compressionData);
+int decode(uint8_t **huffmanData, uint quantifLevel, std::vector<cv::Size> &oSize, std::vector<uint> &lineSizes, std::vector<int> &compressionData);
 void dispImg(std::string message, cv::Mat &image);
-template <typename T> std::vector<T> linearise(std::vector<T> y, std::vector<T> cb, std::vector<T> cr, std::vector<uint> * lineSizes);
-template <typename T> void delinearise(std::vector<T> line, std::vector<T> * y, std::vector<T> * cb, std::vector<T> * cr, std::vector<uint> lineSizes);
+template <typename T> std::vector<T> linearise(std::vector<T> &y, std::vector<T> &cb, std::vector<T> &cr, std::vector<uint> &lineSizes);
+template <typename T> void delinearise(std::vector<T> &line, std::vector<T> &y, std::vector<T> &cb, std::vector<T> &cr, std::vector<uint> &lineSizes);
 
 #endif

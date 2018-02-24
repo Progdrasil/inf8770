@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int code(fs::path path, bool subsampling, uint quantifLevel, std::vector<cv::Mat_<char>> &quantif, std::vector<cv::Size> *ycbcrSize, std::vector<uint> *lineSizes)
+int code(fs::path path, bool subsampling, uint quantifLevel, uint8_t **huffmanData, std::vector<cv::Size> &ycbcrSize, std::vector<uint> &lineSizes, std::vector<int> &compressionData)
 {
 	cout << "Will read file: " << path.string() << endl;
 
@@ -34,9 +34,9 @@ int code(fs::path path, bool subsampling, uint quantifLevel, std::vector<cv::Mat
 		cout << "Could not convert the image to YCbCr" << endl;
 		return -1;
 	}
-	ycbcrSize->push_back(y.size());
-	ycbcrSize->push_back(cb.size());
-	ycbcrSize->push_back(cr.size());
+	ycbcrSize.push_back(y.size());
+	ycbcrSize.push_back(cb.size());
+	ycbcrSize.push_back(cr.size());
 
 	std::vector<cv::Mat_<uchar>> blocksY = matrix2blocks(y);
 	std::vector<cv::Mat_<uchar>> blocksCb = matrix2blocks(cb);
@@ -46,7 +46,8 @@ int code(fs::path path, bool subsampling, uint quantifLevel, std::vector<cv::Mat
 
 	std::vector<cv::Mat_<float>> dct = blocks2dct(blocks);
 
-	quantif = quantification(dct, quantifLevel);
+	std::vector<cv::Mat_<char>> quantif = quantification(dct, quantifLevel);
+	compressionData.push_back(quantif.size());
 
 	std::vector<char> zigzag = blocks2vector(quantif);
 
@@ -59,71 +60,63 @@ int code(fs::path path, bool subsampling, uint quantifLevel, std::vector<cv::Mat
 										rle.data(),
 										rle.size());
 
+	compressionData.push_back(zigzagSize);
+	compressionData.push_back(rleSize);
+
 	std::cout << "RLE compressed size bytes   = " << rleSize << "\n";
 	std::cout << "RLE uncompressed size bytes = " << zigzagSize << "\n";
 
 	// Compress with Huffman:
-	int compressedSizeBytes = 0;
-	int compressedSizeBits = 0;
-	std::uint8_t *compressedData = nullptr;
+	int huffmanSizeBytes = 0;
+	int huffmanSizeBits = 0;
 	uint8_t *rleData = rle.data();
 
-	huffman::easyEncode(rleData, rleSize, &compressedData,
-						&compressedSizeBytes, &compressedSizeBits);
+	huffman::easyEncode(rleData, rleSize, huffmanData,
+						&huffmanSizeBytes, &huffmanSizeBits);
+	compressionData.push_back(huffmanSizeBytes);
+	compressionData.push_back(huffmanSizeBits);
 
-	std::cout << "Huffman compressed size bytes   = " << compressedSizeBytes << "\n";
+	std::cout << "Huffman compressed size bytes   = " << huffmanSizeBytes << "\n";
 	std::cout << "Huffman uncompressed size bytes = " << rleSize << "\n";
-
-
-	// DECOMPRESSION =============================================================================
-	// Restore from Huffman:
-	std::vector<std::uint8_t> uncompressedBuffer(rleSize, 0);
-	const int uncompressedSizeHuffman = huffman::easyDecode(compressedData, compressedSizeBytes, compressedSizeBits,
-													 uncompressedBuffer.data(), uncompressedBuffer.size());
-
-	// Restore from RLE:
-	std::vector<std::uint8_t> uncompressedRLE(zigzagSize, 0);
-	const int uncompressedSizeRLE = rle::easyDecode(rle.data(), rleSize,
-												 uncompressedRLE.data(), uncompressedRLE.size());
-	std::vector<char> inv_rle(uncompressedRLE.begin(), uncompressedRLE.end());
-
-	cv::Size sizeblock = quantif[0].size();
-	std::vector<cv::Mat_<char>> inv_zigzag = vector2blocks(inv_rle, sizeblock, quantif.size());
-	std::vector<cv::Mat_<float>> inv_quantif = inv_quantification(inv_zigzag, quantifLevel);
-
-	std::vector<cv::Mat_<uchar>> inv_blocks = dct2blocks(inv_quantif);
-
-	std::vector<cv::Mat_<uchar>> inv_blocksY;
-	std::vector<cv::Mat_<uchar>> inv_blocksCb;
-	std::vector<cv::Mat_<uchar>> inv_blocksCr;
-	delinearise(inv_blocks, &inv_blocksY, &inv_blocksCb, &inv_blocksCr, *lineSizes);
-
-	cv::Mat_<uchar> yinv = blocks2matrix(inv_blocksY, y.size());
-	cv::Mat_<uchar> cbinv = blocks2matrix(inv_blocksCb, cb.size());
-	cv::Mat_<uchar> crinv = blocks2matrix(inv_blocksCr, cr.size());
-
-	cv::Mat bgrOut = ycbcr2bgr(yinv, cbinv, crinv);
-
-	dispImg("Decompression result", bgrOut);
-
-	// Wait for a keystroke in the window
-	cv::waitKey(0);
-
-	// ==================================================================================================
-
+		
 	return 0;
 }
 
-int decode(std::vector<cv::Mat_<char>> quantif, uint quantifLevel, std::vector<cv::Size> ycbcrSize, std::vector<uint> lineSizes)
+int decode(uint8_t **huffmanData, uint quantifLevel, std::vector<cv::Size> &ycbcrSize, std::vector<uint> &lineSizes, std::vector<int> &compressionData)
 {
-	std::vector<cv::Mat_<float>> inv_quantif = inv_quantification(quantif, quantifLevel);
+	int huffmanSizeBits = compressionData.back();
+	compressionData.pop_back();
+	int huffmanSizeBytes = compressionData.back();
+	compressionData.pop_back();
+	int rleSize = compressionData.back();
+	compressionData.pop_back();
+	int zigzagSize = compressionData.back();
+	compressionData.pop_back();
+	int quantifSize = compressionData.back();
+	compressionData.pop_back();
+
+	// Restore from Huffman:
+	std::vector<std::uint8_t> uncompressedHuffman(rleSize, 0);
+	const int uncompressedSizeHuffman = huffman::easyDecode(*huffmanData, huffmanSizeBytes, huffmanSizeBits,
+															uncompressedHuffman.data(), uncompressedHuffman.size());
+
+	// Restore from RLE:
+	std::vector<std::uint8_t> uncompressedRLE(zigzagSize, 0);
+	const int uncompressedSizeRLE = rle::easyDecode(uncompressedHuffman.data(), rleSize,
+													uncompressedRLE.data(), uncompressedRLE.size());
+	std::vector<char> inv_rle(uncompressedRLE.begin(), uncompressedRLE.end());
+
+	// TODO Changer hardcode de la taille
+	cv::Size sizeblock(8,8);
+	std::vector<cv::Mat_<char>> inv_zigzag = vector2blocks(inv_rle, sizeblock, quantifSize);
+	std::vector<cv::Mat_<float>> inv_quantif = inv_quantification(inv_zigzag, quantifLevel);
 
 	std::vector<cv::Mat_<uchar>> blocks = dct2blocks(inv_quantif);
 
 	std::vector<cv::Mat_<uchar>> blocksY;
 	std::vector<cv::Mat_<uchar>> blocksCb;
 	std::vector<cv::Mat_<uchar>> blocksCr;
-	delinearise(blocks, &blocksY, &blocksCb, &blocksCr, lineSizes);
+	delinearise(blocks, blocksY, blocksCb, blocksCr, lineSizes);
 
 	cv::Mat_<uchar> y = blocks2matrix(blocksY, ycbcrSize.at(0));
 	cv::Mat_<uchar> cb = blocks2matrix(blocksCb, ycbcrSize.at(1));
@@ -149,24 +142,24 @@ void dispImg(string message, cv::Mat &image)
 }
 
 template <typename T>
-std::vector<T> linearise(std::vector<T> y, std::vector<T> cb, std::vector<T> cr, vector<uint> *lineSizes)
+std::vector<T> linearise(std::vector<T> &y, std::vector<T> &cb, std::vector<T> &cr, vector<uint> &lineSizes)
 {
 	std::vector<T> line;
 
-	lineSizes->push_back((uint)y.size());
+	lineSizes.push_back((uint)y.size());
 	line.insert(line.end(), y.begin(), y.end());
 
-	lineSizes->push_back((uint)cb.size());
+	lineSizes.push_back((uint)cb.size());
 	line.insert(line.end(), cb.begin(), cb.end());
 
-	lineSizes->push_back((uint)cr.size());
+	lineSizes.push_back((uint)cr.size());
 	line.insert(line.end(), cr.begin(), cr.end());
 
 	return line;
 }
 
 template <typename T>
-void delinearise(std::vector<T> line, std::vector<T> *y, std::vector<T> *cb, std::vector<T> *cr, std::vector<uint> lineSizes)
+void delinearise(std::vector<T> &line, std::vector<T> &y, std::vector<T> &cb, std::vector<T> &cr, std::vector<uint> &lineSizes)
 {
 	uint ys = lineSizes.at(0);
 	uint cbs = lineSizes.at(1);
@@ -174,16 +167,16 @@ void delinearise(std::vector<T> line, std::vector<T> *y, std::vector<T> *cb, std
 
 	for (uint i = 0; i < ys; i++)
 	{
-		y->push_back(line.at(i));
+		y.push_back(line.at(i));
 	}
 
 	for (uint i = ys; i < ys + cbs; i++)
 	{
-		cb->push_back(line.at(i));
+		cb.push_back(line.at(i));
 	}
 
 	for (uint i = ys + cbs; i < ys + cbs + crs; i++)
 	{
-		cr->push_back(line.at(i));
+		cr.push_back(line.at(i));
 	}
 }

@@ -57,18 +57,19 @@ int main(int argc, char *argv[]) {
 	}
 	else if (vm.count("path")) {
 		bool subsampling = ! vm.count("noSubsampling");
-		std::vector<cv::Mat_<char>> quantif;
+		uint8_t *huffmanData = nullptr;
 		std::vector<cv::Size> ycbcrSize;
 		std::vector<uint> lineSizes;
-		int codeRes = code(path, subsampling, quantifLevel, quantif, &ycbcrSize, &lineSizes);
+		std::vector<int> compressionData;
+		int codeRes = code(path, subsampling, quantifLevel, &huffmanData, ycbcrSize, lineSizes, compressionData);
 		if (codeRes != 0) {
 			return codeRes;
 		}
 
-		// int decodeRes = decode(quantif, quantifLevel, ycbcrSize, lineSizes);
-		// if (decodeRes != 0) {
-		// 	return decodeRes;
-		// }
+		int decodeRes = decode(&huffmanData, quantifLevel, ycbcrSize, lineSizes, compressionData);
+		if (decodeRes != 0) {
+			return decodeRes;
+		}
 	}
 	else {
 		cout << "ERROR: Must specify the path to the input file!" << endl;
