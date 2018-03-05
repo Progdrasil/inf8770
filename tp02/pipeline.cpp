@@ -26,8 +26,9 @@ int code(fs::path path, bool subsampling, uint quantifLevel, uint8_t **huffmanDa
 	}
 
 	dispImg("Original image", bgr);
-	cout << "Original image size bytes = " << bgr.total() * bgr.elemSize() << endl;
 
+	int originalSize = bgr.total() * bgr.elemSize();
+	cout << "Original image size bytes = " << originalSize << endl;
 
 	// convert BGR to YCbCr
 	bgr2ycbcr(bgr, y, cb, cr, subsampling);
@@ -65,8 +66,8 @@ int code(fs::path path, bool subsampling, uint quantifLevel, uint8_t **huffmanDa
 	compressionData.push_back(zigzagSize);
 	compressionData.push_back(rleSize);
 
-	std::cout << "RLE compressed size bytes   = " << rleSize << "\n";
-	std::cout << "RLE uncompressed size bytes = " << zigzagSize << "\n";
+	cout << "RLE compressed size bytes   = " << rleSize << endl;
+	cout << "RLE uncompressed size bytes = " << zigzagSize << endl;
 
 	// Compress with Huffman:
 	int huffmanSizeBytes = 0;
@@ -78,8 +79,11 @@ int code(fs::path path, bool subsampling, uint quantifLevel, uint8_t **huffmanDa
 	compressionData.push_back(huffmanSizeBytes);
 	compressionData.push_back(huffmanSizeBits);
 
-	std::cout << "Huffman compressed size bytes   = " << huffmanSizeBytes << "\n";
-	std::cout << "Huffman uncompressed size bytes = " << rleSize << "\n";
+	cout << "Huffman compressed size bytes   = " << huffmanSizeBytes << endl;
+	cout << "Huffman uncompressed size bytes = " << rleSize << endl;
+
+	float compRatio = 1.0 - (float)huffmanSizeBytes/(float)originalSize;
+	cout << "Compression ration = " << compRatio << endl;
 
 	return 0;
 }
