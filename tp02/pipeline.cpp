@@ -78,7 +78,7 @@ int code(fs::path path, bool subsampling, uint quantifLevel, uint8_t **huffmanDa
 
 	std::cout << "Huffman compressed size bytes   = " << huffmanSizeBytes << "\n";
 	std::cout << "Huffman uncompressed size bytes = " << rleSize << "\n";
-		
+
 	return 0;
 }
 
@@ -113,10 +113,8 @@ int decode(uint8_t **huffmanData, uint quantifLevel, std::vector<cv::Size> &ycbc
 
 	std::vector<cv::Mat_<uchar>> blocks = dct2blocks(inv_quantif);
 
-	std::vector<cv::Mat_<uchar>> blocksY;
-	std::vector<cv::Mat_<uchar>> blocksCb;
-	std::vector<cv::Mat_<uchar>> blocksCr;
-	delinearise(blocks, blocksY, blocksCb, blocksCr, lineSizes);
+	std::vector<cv::Mat_<uchar>> blocksY, blocksCb, blocksCr;
+	delinearise(blocks, &blocksY, &blocksCb, &blocksCr, lineSizes);
 
 	cv::Mat_<uchar> y = blocks2matrix(blocksY, ycbcrSize.at(0));
 	cv::Mat_<uchar> cb = blocks2matrix(blocksCb, ycbcrSize.at(1));
