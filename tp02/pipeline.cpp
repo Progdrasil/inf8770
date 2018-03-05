@@ -114,8 +114,8 @@ int decode(uint8_t **huffmanData, uint quantifLevel, std::vector<cv::Size> &ycbc
 	std::vector<cv::Mat_<uchar>> blocks = dct2blocks(inv_quantif);
 
 	std::vector<cv::Mat_<uchar>> blocksY, blocksCb, blocksCr;
-	delinearise(blocks, &blocksY, &blocksCb, &blocksCr, lineSizes);
-
+	delinearise(blocks, blocksY, blocksCb, blocksCr, lineSizes);
+	
 	cv::Mat_<uchar> y = blocks2matrix(blocksY, ycbcrSize.at(0));
 	cv::Mat_<uchar> cb = blocks2matrix(blocksCb, ycbcrSize.at(1));
 	cv::Mat_<uchar> cr = blocks2matrix(blocksCr, ycbcrSize.at(2));
