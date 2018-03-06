@@ -4,6 +4,7 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 
+#include "quantifType.hpp"
 #include "conversion.hpp"
 #include "bloc.hpp"
 #include "dct.hpp"

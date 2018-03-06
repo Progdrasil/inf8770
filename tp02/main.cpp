@@ -12,6 +12,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <iostream>
+#include "quantifType.hpp"
 #include "pipeline.hpp"
 
 using namespace std;
@@ -35,7 +36,7 @@ int main(int argc, char *argv[])
 		("help,h", "Shows this useful help message")
 		("path,p", po::value<fs::path>(&path), "Path to the file to code/decode")
 		("noSubsampling,y", "Deactivate YCbCr 4:2:0 subsampling")
-		("quantification,q", po::value<int>(&quantifLevel)->default_value(-1), "Specify level of quantification to use")
+		("quantification,q", po::value<int>(&quantifLevel)->default_value(1), "Specify level of quantification to use")
 		("multiple-quantification,m", po::value<int>(&nbQuantif)->default_value(1), "Specify number of quantifications done")
 		("quantification-type,t", po::value<quantifType>(&qtype)->default_value(quantifType::BASIC),"Specify the type of quantification matrix: basic, level, constant, tri-diagonal")
 		;

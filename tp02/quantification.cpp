@@ -34,7 +34,7 @@ std::vector<cv::Mat_<char>> quantification(const std::vector<cv::Mat_<float>> &i
 	switch (type) {
 		case quantifType::BASIC :
 			std::cout << "JPEG Quantification" << std::endl;
-			quantifLevel = basicQuantif;
+			quantifLevel = basicQuantif * level;
 			std::cout << quantifLevel << std::endl;
 			break;
 		case quantifType::LEVEL :
@@ -44,17 +44,17 @@ std::vector<cv::Mat_<char>> quantification(const std::vector<cv::Mat_<float>> &i
 			break;
 		case quantifType::CONSTANT :
 			std::cout << "Constant quantification : " << level << std::endl;
-			quantifLevel = quantifConstant;
+			quantifLevel = quantifConstant * level;
 			std::cout << quantifLevel << std::endl;
 			break;
 		case quantifType::TRI_DIAGONAL :
 			std::cout << "Tri-diagonal quantification : " << level << std::endl;
-			quantifLevel = quantifTriDiag;
+			quantifLevel = quantifTriDiag * level;
 			std::cout << quantifLevel << std::endl;
 			break;
 		default :
 			std::cout << "JPEG Quantification" << std::endl;
-			quantifLevel = basicQuantif;
+			quantifLevel = basicQuantif * level;
 			std::cout << quantifLevel << std::endl;
 			break;
 	}
@@ -87,10 +87,23 @@ std::vector<cv::Mat_<char>> quantification(const std::vector<cv::Mat_<float>> &i
 std::vector<cv::Mat_<float>> inv_quantification(const std::vector<cv::Mat_<char>> &inQuantif, quantifType type, int level)
 {
     cv::Mat_<int> quantifLevel;
-    if (level != -1)
-        quantifLevel = createQuantification(level);
-    else
-        quantifLevel = basicQuantif;
+	switch (type) {
+		case quantifType::BASIC :
+			quantifLevel = basicQuantif * level;
+			break;
+		case quantifType::LEVEL :
+			quantifLevel = createQuantification(level);
+			break;
+		case quantifType::CONSTANT :
+			quantifLevel = quantifConstant * level;
+			break;
+		case quantifType::TRI_DIAGONAL :
+			quantifLevel = quantifTriDiag * level;
+			break;
+		default :
+			quantifLevel = basicQuantif * level;
+			break;
+	}
 
     int nbBlocks = inQuantif.size();
     std::vector<cv::Mat_<float>> outBlocks;
