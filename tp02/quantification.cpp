@@ -1,7 +1,7 @@
 #include "quantification.hpp"
 #include <iostream>
 
-const cv::Mat_<uchar> basicQuantif = (cv::Mat_<uchar>(8, 8) << 16, 11, 10, 16, 24, 40, 51, 61,
+const cv::Mat_<int> basicQuantif = (cv::Mat_<int>(8, 8) << 16, 11, 10, 16, 24, 40, 51, 61,
                                       12, 12, 14, 19, 26, 58, 60, 55,
                                       14, 13, 16, 24, 40, 57, 69, 56,
                                       14, 17, 22, 29, 51, 87, 80, 62,
@@ -12,6 +12,20 @@ const cv::Mat_<uchar> basicQuantif = (cv::Mat_<uchar>(8, 8) << 16, 11, 10, 16, 2
 
 std::vector<cv::Mat_<char>> quantification(const std::vector<cv::Mat_<float>> &inDct, int level)
 {
+    cv::Mat_<int> quantifLevel;
+    if(level != -1)
+    {
+        std::cout << "Quantification level : " << level << std::endl;
+        quantifLevel = createQuantification(level);
+        std::cout << quantifLevel << std::endl;
+    }
+    else
+    {
+        std::cout << "JPEG Quantification" << std::endl;
+        quantifLevel = basicQuantif;
+        std::cout << quantifLevel << std::endl;
+    }
+
     int nbBlocks = inDct.size();
     std::vector<cv::Mat_<char>> outQuantif;
     outQuantif.reserve(nbBlocks);
@@ -26,20 +40,10 @@ std::vector<cv::Mat_<char>> quantification(const std::vector<cv::Mat_<float>> &i
         {
             for (int v = 0; v < cols; v++)
             {
-                if (level != 0)
-                {
-                    float tmp = std::nearbyint(inBlock.at<float>(u, v) / basicQuantif.at<char>(u, v) / level);
-                    quantif.at<char>(u, v) = tmp;
-                    if (tmp < -128 || tmp > 127)
-                        std::cout << "Overflow : " << tmp << std::endl;
-                }
-                else if (level == 0)
-                {
-                    float tmp = inBlock.at<float>(u, v);
-                    quantif.at<char>(u, v) = inBlock.at<float>(u, v);
-                    if (tmp < -128 || tmp > 127)
-                        std::cout << "Overflow : " << tmp << std::endl;
-                }
+                float tmp = std::nearbyint(inBlock.at<float>(u, v) / quantifLevel.at<int>(u, v));
+                quantif.at<char>(u, v) = tmp;
+                // if(tmp > 127 || tmp < -128)
+                //     std::cout << "Overflow" << std::endl;
             }
         }
         outQuantif.push_back(quantif);
@@ -49,6 +53,12 @@ std::vector<cv::Mat_<char>> quantification(const std::vector<cv::Mat_<float>> &i
 
 std::vector<cv::Mat_<float>> inv_quantification(const std::vector<cv::Mat_<char>> &inQuantif, int level)
 {
+    cv::Mat_<int> quantifLevel;
+    if (level != -1)
+        quantifLevel = createQuantification(level);
+    else
+        quantifLevel = basicQuantif;
+
     int nbBlocks = inQuantif.size();
     std::vector<cv::Mat_<float>> outBlocks;
     outBlocks.reserve(nbBlocks);
@@ -63,13 +73,26 @@ std::vector<cv::Mat_<float>> inv_quantification(const std::vector<cv::Mat_<char>
         {
             for (int v = 0; v < cols; v++)
             {
-                if (level != 0)
-                    block.at<float>(u, v) = inQuant.at<char>(u, v) * basicQuantif.at<char>(u, v) * level;
-                else if (level == 0)
-                    block.at<float>(u, v) = inQuant.at<char>(u, v);
+                block.at<float>(u, v) = inQuant.at<char>(u, v) * quantifLevel.at<int>(u, v);
             }
         }
         outBlocks.push_back(block);
     }
     return outBlocks;
+}
+
+cv::Mat_<int> createQuantification(int level)
+{
+    cv::Size sizeQuantif(8,8);
+    cv::Mat_<int> quantif(sizeQuantif);
+
+    for(int i = 0; i < quantif.rows; i++)
+    {
+        for (int j = 0; j < quantif.cols; j++)
+        {
+            quantif.at<int>(i,j) = 1 + (i+j+1) * level;
+        }
+    }
+
+    return quantif;
 }

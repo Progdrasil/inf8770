@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int code(fs::path path, bool subsampling, uint quantifLevel, uint8_t **huffmanData, std::vector<cv::Size> &ycbcrSize, std::vector<uint> &lineSizes, std::vector<int> &compressionData)
+int code(fs::path path, bool subsampling, int quantifLevel, uint8_t **huffmanData, std::vector<cv::Size> &ycbcrSize, std::vector<uint> &lineSizes, std::vector<int> &compressionData)
 {
 	cout << "Will read file: " << path.string() << endl;
 
@@ -63,8 +63,8 @@ int code(fs::path path, bool subsampling, uint quantifLevel, uint8_t **huffmanDa
 	compressionData.push_back(zigzagSize);
 	compressionData.push_back(rleSize);
 
-	std::cout << "RLE compressed size bytes   = " << rleSize << "\n";
-	std::cout << "RLE uncompressed size bytes = " << zigzagSize << "\n";
+	// std::cout << "RLE compressed size bytes   = " << rleSize << "\n";
+	// std::cout << "RLE uncompressed size bytes = " << zigzagSize << "\n";
 
 	// Compress with Huffman:
 	int huffmanSizeBytes = 0;
@@ -76,13 +76,16 @@ int code(fs::path path, bool subsampling, uint quantifLevel, uint8_t **huffmanDa
 	compressionData.push_back(huffmanSizeBytes);
 	compressionData.push_back(huffmanSizeBits);
 
-	std::cout << "Huffman compressed size bytes   = " << huffmanSizeBytes << "\n";
-	std::cout << "Huffman uncompressed size bytes = " << rleSize << "\n";
+	// std::cout << "Huffman compressed size bytes   = " << huffmanSizeBytes << "\n";
+	// std::cout << "Huffman uncompressed size bytes = " << rleSize << "\n";
+
+	float compressionRate = 1 - ((float) huffmanSizeBytes / (float) (bgr.total() * bgr.elemSize()));
+	std::cout << "Compression rate : " << to_string(compressionRate) << std::endl;
 		
 	return 0;
 }
 
-int decode(uint8_t **huffmanData, uint quantifLevel, std::vector<cv::Size> &ycbcrSize, std::vector<uint> &lineSizes, std::vector<int> &compressionData)
+int decode(fs::path savedPath, uint8_t **huffmanData, int quantifLevel, std::vector<cv::Size> &ycbcrSize, std::vector<uint> &lineSizes, std::vector<int> &compressionData)
 {
 	int huffmanSizeBits = compressionData.back();
 	compressionData.pop_back();
@@ -126,8 +129,8 @@ int decode(uint8_t **huffmanData, uint quantifLevel, std::vector<cv::Size> &ycbc
 
 	dispImg("Decompression result", bgrOut);
 
-	// Wait for a keystroke in the window
-	cv::waitKey(0);
+	std::cout << "Saving decompressed image in " + savedPath.string() << std::endl;
+	cv::imwrite(savedPath.string(), bgrOut);
 
 	return 0;
 }
