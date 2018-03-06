@@ -10,6 +10,24 @@ const cv::Mat_<int> basicQuantif = (cv::Mat_<int>(8, 8) << 16, 11, 10, 16, 24, 4
                                       49, 64, 78, 87, 103, 121, 120, 101,
                                       72, 92, 95, 98, 112, 100, 103, 99);
 
+const cv::Mat_<int> quantifConstant = (cv::Mat_<int>(8,8) << 1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1, 1, 1, 1, 1, 1);
+
+const cv::Mat_<int> quantifTriDiag = (cv::Mat_<int>(8,8) << 1, 1, 0, 0, 0, 0, 0, 0,
+1, 1, 1, 0, 0, 0, 0, 0,
+0, 1, 1, 1, 0, 0, 0, 0,
+0, 0, 1, 1, 1, 0, 0, 0,
+0, 0, 0, 1, 1, 1, 0, 0,
+0, 0, 0, 0, 1, 1, 1, 0,
+0, 0, 0, 0, 0, 1, 1, 1,
+0, 0, 0, 0, 0, 0, 1, 1);
+
 std::vector<cv::Mat_<char>> quantification(const std::vector<cv::Mat_<float>> &inDct, int level)
 {
     cv::Mat_<int> quantifLevel;

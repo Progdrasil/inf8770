@@ -6,6 +6,8 @@
 // #include <opencv2/imgproc/imgproc.hpp>
 
 extern const cv::Mat_<int> basicQuantif;
+extern const cv::Mat_<int> quantifConstant;
+extern const cv::Mat_<int> quantifTriDiag;
 
 std::vector<cv::Mat_<char>> quantification(const std::vector<cv::Mat_<float>> &inDct, int level = -1);
 std::vector<cv::Mat_<float>> inv_quantification(const std::vector<cv::Mat_<char>> &inQuantif, int level = -1);
