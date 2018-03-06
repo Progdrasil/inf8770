@@ -27,6 +27,9 @@ int code(fs::path path, bool subsampling, int quantifLevel, uint8_t **huffmanDat
 
 	dispImg("Original image", bgr);
 
+	int originalSize = bgr.total() * bgr.elemSize();
+	cout << "Original image size bytes = " << originalSize << endl;
+
 	// convert BGR to YCbCr
 	bgr2ycbcr(bgr, y, cb, cr, subsampling);
 	if (!y.data || !cb.data || !cr.data)
@@ -79,7 +82,7 @@ int code(fs::path path, bool subsampling, int quantifLevel, uint8_t **huffmanDat
 	// std::cout << "Huffman compressed size bytes   = " << huffmanSizeBytes << "\n";
 	// std::cout << "Huffman uncompressed size bytes = " << rleSize << "\n";
 
-	float compressionRate = 1 - ((float) huffmanSizeBytes / (float) (bgr.total() * bgr.elemSize()));
+	float compressionRate = 1.f - ((float) huffmanSizeBytes / (float)originalSize);
 	std::cout << "Compression rate : " << to_string(compressionRate) << std::endl;
 		
 	return 0;
@@ -116,9 +119,7 @@ int decode(fs::path savedPath, uint8_t **huffmanData, int quantifLevel, std::vec
 
 	std::vector<cv::Mat_<uchar>> blocks = dct2blocks(inv_quantif);
 
-	std::vector<cv::Mat_<uchar>> blocksY;
-	std::vector<cv::Mat_<uchar>> blocksCb;
-	std::vector<cv::Mat_<uchar>> blocksCr;
+	std::vector<cv::Mat_<uchar>> blocksY, blocksCb, blocksCr;
 	delinearise(blocks, blocksY, blocksCb, blocksCr, lineSizes);
 
 	cv::Mat_<uchar> y = blocks2matrix(blocksY, ycbcrSize.at(0));
