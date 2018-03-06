@@ -28,21 +28,36 @@ const cv::Mat_<int> quantifTriDiag = (cv::Mat_<int>(8,8) << 1, 1, 0, 0, 0, 0, 0,
 0, 0, 0, 0, 0, 1, 1, 1,
 0, 0, 0, 0, 0, 0, 1, 1);
 
-std::vector<cv::Mat_<char>> quantification(const std::vector<cv::Mat_<float>> &inDct, int level)
+std::vector<cv::Mat_<char>> quantification(const std::vector<cv::Mat_<float>> &inDct, quantifType type, int level)
 {
     cv::Mat_<int> quantifLevel;
-    if(level != -1)
-    {
-        std::cout << "Quantification level : " << level << std::endl;
-        quantifLevel = createQuantification(level);
-        std::cout << quantifLevel << std::endl;
-    }
-    else
-    {
-        std::cout << "JPEG Quantification" << std::endl;
-        quantifLevel = basicQuantif;
-        std::cout << quantifLevel << std::endl;
-    }
+	switch (type) {
+		case quantifType::BASIC :
+			std::cout << "JPEG Quantification" << std::endl;
+			quantifLevel = basicQuantif;
+			std::cout << quantifLevel << std::endl;
+			break;
+		case quantifType::LEVEL :
+			std::cout << "Quantification level : " << level << std::endl;
+			quantifLevel = createQuantification(level);
+			std::cout << quantifLevel << std::endl;
+			break;
+		case quantifType::CONSTANT :
+			std::cout << "Constant quantification : " << level << std::endl;
+			quantifLevel = quantifConstant;
+			std::cout << quantifLevel << std::endl;
+			break;
+		case quantifType::TRI_DIAGONAL :
+			std::cout << "Tri-diagonal quantification : " << level << std::endl;
+			quantifLevel = quantifTriDiag;
+			std::cout << quantifLevel << std::endl;
+			break;
+		default :
+			std::cout << "JPEG Quantification" << std::endl;
+			quantifLevel = basicQuantif;
+			std::cout << quantifLevel << std::endl;
+			break;
+	}
 
     int nbBlocks = inDct.size();
     std::vector<cv::Mat_<char>> outQuantif;
@@ -69,7 +84,7 @@ std::vector<cv::Mat_<char>> quantification(const std::vector<cv::Mat_<float>> &i
     return outQuantif;
 }
 
-std::vector<cv::Mat_<float>> inv_quantification(const std::vector<cv::Mat_<char>> &inQuantif, int level)
+std::vector<cv::Mat_<float>> inv_quantification(const std::vector<cv::Mat_<char>> &inQuantif, quantifType type, int level)
 {
     cv::Mat_<int> quantifLevel;
     if (level != -1)

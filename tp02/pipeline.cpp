@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int code(fs::path path, bool subsampling, int quantifLevel, uint8_t **huffmanData, std::vector<cv::Size> &ycbcrSize, std::vector<uint> &lineSizes, std::vector<int> &compressionData)
+int code(fs::path path, bool subsampling, int quantifLevel, quantifType type, uint8_t **huffmanData, std::vector<cv::Size> &ycbcrSize, std::vector<uint> &lineSizes, std::vector<int> &compressionData)
 {
 	cout << "Will read file: " << path.string() << endl;
 
@@ -49,7 +49,7 @@ int code(fs::path path, bool subsampling, int quantifLevel, uint8_t **huffmanDat
 
 	std::vector<cv::Mat_<float>> dct = blocks2dct(blocks);
 
-	std::vector<cv::Mat_<char>> quantif = quantification(dct, quantifLevel);
+	std::vector<cv::Mat_<char>> quantif = quantification(dct, type, quantifLevel);
 	compressionData.push_back(quantif.size());
 
 	std::vector<char> zigzag = blocks2vector(quantif);
@@ -84,11 +84,11 @@ int code(fs::path path, bool subsampling, int quantifLevel, uint8_t **huffmanDat
 
 	float compressionRate = 1.f - ((float) huffmanSizeBytes / (float)originalSize);
 	std::cout << "Compression rate : " << to_string(compressionRate) << std::endl;
-		
+
 	return 0;
 }
 
-int decode(fs::path savedPath, uint8_t **huffmanData, int quantifLevel, std::vector<cv::Size> &ycbcrSize, std::vector<uint> &lineSizes, std::vector<int> &compressionData)
+int decode(fs::path savedPath, uint8_t **huffmanData, int quantifLevel, quantifType type, std::vector<cv::Size> &ycbcrSize, std::vector<uint> &lineSizes, std::vector<int> &compressionData)
 {
 	int huffmanSizeBits = compressionData.back();
 	compressionData.pop_back();
@@ -115,7 +115,7 @@ int decode(fs::path savedPath, uint8_t **huffmanData, int quantifLevel, std::vec
 	// TODO Changer hardcode de la taille
 	cv::Size sizeblock(8,8);
 	std::vector<cv::Mat_<char>> inv_zigzag = vector2blocks(inv_rle, sizeblock, quantifSize);
-	std::vector<cv::Mat_<float>> inv_quantif = inv_quantification(inv_zigzag, quantifLevel);
+	std::vector<cv::Mat_<float>> inv_quantif = inv_quantification(inv_zigzag, type, quantifLevel);
 
 	std::vector<cv::Mat_<uchar>> blocks = dct2blocks(inv_quantif);
 

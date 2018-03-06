@@ -25,12 +25,20 @@ int main(int argc, char *argv[])
 	fs::path path;
 	int quantifLevel;
 	int nbQuantif;
+	quantifType qtype;
 
 	// Declare the supported options
 	po::options_description desc{
 		"USAGE: tp [options] <path>\n\n"
 		"Options for homemade JPEG encoder"};
-	desc.add_options()("help,h", "Shows this useful help message")("path,p", po::value<fs::path>(&path), "Path to the file to code/decode")("noSubsampling,y", "Deactivate YCbCr 4:2:0 subsampling")("quantification,q", po::value<int>(&quantifLevel)->default_value(-1), "Specify level of quantification to use")("multiple-quantification,m", po::value<int>(&nbQuantif)->default_value(1), "Specify number of quantifications done");
+	desc.add_options()
+		("help,h", "Shows this useful help message")
+		("path,p", po::value<fs::path>(&path), "Path to the file to code/decode")
+		("noSubsampling,y", "Deactivate YCbCr 4:2:0 subsampling")
+		("quantification,q", po::value<int>(&quantifLevel)->default_value(-1), "Specify level of quantification to use")
+		("multiple-quantification,m", po::value<int>(&nbQuantif)->default_value(1), "Specify number of quantifications done")
+		("quantification-type,t", po::value<quantifType>(&qtype)->default_value(quantifType::BASIC),"Specify the type of quantification matrix: basic, level, constant, tri-diagonal")
+		;
 
 	po::positional_options_description p;
 	p.add("path", -1);
@@ -65,7 +73,7 @@ int main(int argc, char *argv[])
 		fs::path newPath = path;
 		for (int q = 0; q < nbQuantif; q++)
 		{
-			int codeRes = code(newPath, subsampling, quantifLevel, &huffmanData, ycbcrSize, lineSizes, compressionData);
+			int codeRes = code(newPath, subsampling, quantifLevel, qtype, &huffmanData, ycbcrSize, lineSizes, compressionData);
 			if (codeRes != 0)
 			{
 				return codeRes;
@@ -74,7 +82,7 @@ int main(int argc, char *argv[])
 			fs::path savedPath("./results/results" + to_string(q) + "_q"
 					+ to_string(quantifLevel) + "_" + path.filename().string());
 
-			int decodeRes = decode(savedPath, &huffmanData, quantifLevel, ycbcrSize, lineSizes, compressionData);
+			int decodeRes = decode(savedPath, &huffmanData, quantifLevel, qtype, ycbcrSize, lineSizes, compressionData);
 			if (decodeRes != 0)
 			{
 				return decodeRes;
