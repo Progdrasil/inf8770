@@ -79,7 +79,7 @@ int code(fs::path path, bool subsampling, int quantifLevel, quantifType type, ui
 	compressionData.push_back(huffmanSizeBytes);
 	compressionData.push_back(huffmanSizeBits);
 
-	// std::cout << "Huffman compressed size bytes   = " << huffmanSizeBytes << "\n";
+	std::cout << "Final compressed size bytes   = " << huffmanSizeBytes << "\n";
 	// std::cout << "Huffman uncompressed size bytes = " << rleSize << "\n";
 
 	float compressionRate = 1.f - ((float) huffmanSizeBytes / (float)originalSize);
