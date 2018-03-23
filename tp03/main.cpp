@@ -12,6 +12,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <iostream>
+#include "pipeline"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -49,6 +50,7 @@ int main(int argc, char *argv[]) {
 	} else if (vm.count("path")) {
 		cout << "The code monkey's are working hard to "
 				"analyse the file located here: " << path.string() << endl;
+		return open(path);
 	} else {
 		cout << "ERROR: Must specify the path to the input file!" << endl;
 		cout << desc << endl;
