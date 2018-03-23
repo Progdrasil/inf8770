@@ -12,7 +12,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <iostream>
-#include "pipeline"
+#include "pipeline.hpp"
 
 using namespace std;
 namespace po = boost::program_options;

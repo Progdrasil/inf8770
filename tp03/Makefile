@@ -1,7 +1,8 @@
 CC := g++
-CPPFLAGS := -Wall -g -std=c++11 -Iinclude -Iinclude/compression
+CPPFLAGS := -Wall -g -std=c++11 -Iinclude
 LDFLAGS := 	-lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc \
-			-lboost_program_options -lboost_filesystem -lboost_system
+			-lopencv_video -lopencv_videoio \
+			-lboost_program_options -lboost_filesystem -lboost_system 
 
 OBJ_DIR := ./obj
 SRCS := $(wildcard *.cpp)

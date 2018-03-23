@@ -6,4 +6,6 @@
 
 int open(boost::filesystem::path path);
 
+void histogrammes(cv::VideoCapture& vid, std::vector<cv::Mat>* b_hist, std::vector<cv::Mat>* g_hist, std::vector<cv::Mat>* r_hist);
+
 #endif
