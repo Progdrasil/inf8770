@@ -4,7 +4,10 @@ namespace fs = boost::filesystem;
 using namespace std;
 
 // number of bins of the histograms
-const int HIST_SIZE = 16;
+const int HIST_SIZE = 64;
+const int CUT_THRESHOLD = 50000;
+const int DISSOLVE_THRESHOLD = 5000;
+const int WAIT_DISPLAY = 250;
 
 int open(fs::path path){
 	// open the video file
@@ -20,24 +23,56 @@ int open(fs::path path){
 
 	histogrammes(vid, b_hist, g_hist, r_hist);
 
+	std::ofstream fileDist("distances.csv");
+
+	std::cout << "Ouverture du fichier " << std::endl;
+	if (!fileDist.is_open())
+	{
+		std::cerr << "Erreur : impossible d'ouvrir le fichier";
+		exit(1);
+	}
+	
+	fileDist << "Frame\tDistance;" << std::endl;
 
 	int frameNumber = (int) vid.get(CV_CAP_PROP_FRAME_COUNT);
 	double fps = vid.get(CV_CAP_PROP_FPS);
 
 	for(int i=0;i<frameNumber-2;i++)
 	{
+		bool dissolveDetected = false;
+		int dissolveBegin = i;
+
 		float dist = calculerDistance(b_hist, g_hist, r_hist, i, i+1);
-		if(dist > 10000)
+		fileDist << i << "\t" << dist << ";" << std::endl;
+		if(dist > CUT_THRESHOLD)
 		{
 			std::cout << "Coupure detectée entre trames " << i << " et " << i+1 << std::endl;
 			std::cout << "Temps de la vidéo : " << (i+1)/fps << "s" << std::endl;
 			vid.set(1, i);
 			cv::Mat frame;
 			vid >> frame;
-			dispImg("coupure", frame);
-			cv::waitKey(0);
+
+			dispImg("Coupure - Trame n°"+std::to_string(i), frame);
+		}
+		else if(dist > DISSOLVE_THRESHOLD)
+		{
+			while(dist > DISSOLVE_THRESHOLD)
+			{
+				i++;
+				dist = calculerDistance(b_hist, g_hist, r_hist, i, i+1);
+				fileDist << i << "\t" << dist << ";" << std::endl;
+			}
+
+			float distanceDissolve = calculerDistance(b_hist, g_hist, r_hist, dissolveBegin, i);
+			if(distanceDissolve > CUT_THRESHOLD)
+			{
+				std::cout << "Fondu detecté entre trames " << dissolveBegin << " et " << i << std::endl;
+				std::cout << "Temps de la vidéo : " << dissolveBegin/fps << "s et "
+					<< i/fps << "s." << std::endl;
+			}
 		}
 	}
+	fileDist.close();
 
 	return 0;
 }
@@ -119,4 +154,7 @@ void dispImg(string message, cv::Mat &image)
 
 	// Show our image inside it.
 	cv::imshow(message, image);
+
+	cv::waitKey(WAIT_DISPLAY);
+	cv::destroyWindow(message);
 }
