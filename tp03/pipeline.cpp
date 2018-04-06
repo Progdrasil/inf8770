@@ -4,8 +4,8 @@ namespace fs = boost::filesystem;
 using namespace std;
 
 // number of bins of the histograms
-const int HIST_SIZE = 64;
-const int CUT_THRESHOLD = 50000;
+const int HIST_SIZE = 16;
+const int CUT_THRESHOLD = 15000;
 const int DISSOLVE_THRESHOLD = 5000;
 const int WAIT_DISPLAY = 250;
 
@@ -44,28 +44,56 @@ int open(fs::path path){
 
 		float dist = calculerDistance(b_hist, g_hist, r_hist, i, i+1);
 		fileDist << i << "\t" << dist << ";" << std::endl;
+		// if(dist > CUT_THRESHOLD)
+		// {
+		// 	std::cout << "Coupure detectée entre trames " << i << " et " << i+1 << std::endl;
+		// 	std::cout << "Temps de la vidéo : " << (i+1)/fps << "s" << std::endl;
+		// 	vid.set(1, i);
+		// 	cv::Mat frame;
+		// 	vid >> frame;
+
+		// 	dispImg("Coupure - Trame n°"+std::to_string(i), frame);
+		// }
+		// else if(dist > DISSOLVE_THRESHOLD)
+		// {
+		// 	while(dist > DISSOLVE_THRESHOLD)
+		// 	{
+		// 		i++;
+		// 		dist = calculerDistance(b_hist, g_hist, r_hist, i, i+1);
+		// 		fileDist << i << "\t" << dist << ";" << std::endl;
+		// 	}
+
+		// 	float distanceDissolve = calculerDistance(b_hist, g_hist, r_hist, dissolveBegin, i);
+		// 	if(distanceDissolve > CUT_THRESHOLD)
+		// 	{
+		// 		std::cout << "Fondu detecté entre trames " << dissolveBegin << " et " << i << std::endl;
+		// 		std::cout << "Temps de la vidéo : " << dissolveBegin/fps << "s et "
+		// 			<< i/fps << "s." << std::endl;
+		// 	}
+		// }
+
 		if(dist > CUT_THRESHOLD)
 		{
-			std::cout << "Coupure detectée entre trames " << i << " et " << i+1 << std::endl;
-			std::cout << "Temps de la vidéo : " << (i+1)/fps << "s" << std::endl;
-			vid.set(1, i);
-			cv::Mat frame;
-			vid >> frame;
-
-			dispImg("Coupure - Trame n°"+std::to_string(i), frame);
-		}
-		else if(dist > DISSOLVE_THRESHOLD)
-		{
+			int nbDissolve = 0;
+			dist = calculerDistance(b_hist, g_hist, r_hist, i+1, i+2);
 			while(dist > DISSOLVE_THRESHOLD)
 			{
 				i++;
+				nbDissolve++;
 				dist = calculerDistance(b_hist, g_hist, r_hist, i, i+1);
 				fileDist << i << "\t" << dist << ";" << std::endl;
 			}
 
-			float distanceDissolve = calculerDistance(b_hist, g_hist, r_hist, dissolveBegin, i);
-			if(distanceDissolve > CUT_THRESHOLD)
+			if(nbDissolve == 0)
 			{
+				std::cout << "Coupure detectée entre trames " << i << " et " << i+1 << std::endl;
+				std::cout << "Temps de la vidéo : " << (i+1)/fps << "s" << std::endl;
+				vid.set(1, i);
+				cv::Mat frame;
+				vid >> frame;
+
+				dispImg("Coupure - Trame n°"+std::to_string(i), frame);
+			} else {
 				std::cout << "Fondu detecté entre trames " << dissolveBegin << " et " << i << std::endl;
 				std::cout << "Temps de la vidéo : " << dissolveBegin/fps << "s et "
 					<< i/fps << "s." << std::endl;
